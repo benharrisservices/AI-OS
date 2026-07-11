@@ -42,9 +42,11 @@ def build_bindings(
     task_input: dict[str, Any],
     step_outputs: dict[str, dict[str, Any]],
     variables: dict[str, Any],
+    memory: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "input": task_input,
         "steps": step_outputs,
         "vars": variables,
+        "memory": memory or {},
     }

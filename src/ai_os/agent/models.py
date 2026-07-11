@@ -104,6 +104,10 @@ class ExecutionContext(BaseModel):
         default_factory=dict,
         description="Outputs keyed by step_id.",
     )
+    relevant_memories: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Relevant memories injected by the Memory System (not Knowledge).",
+    )
 
 
 class AgentTask(BaseModel):

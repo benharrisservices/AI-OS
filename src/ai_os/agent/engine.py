@@ -20,6 +20,8 @@ from ai_os.agent.resolve import build_bindings, resolve_value
 from ai_os.agent.store import TaskStore
 from ai_os.agent.tools import discover_tools, get_tool
 from ai_os.agent.workflows import AgentLoader, WorkflowLoader
+from ai_os.memory.manager import MemoryManager
+from ai_os.memory.models import EpisodicEventType, PromotionPolicy
 
 
 class ExecutionEngine:
@@ -29,13 +31,18 @@ class ExecutionEngine:
     delegates to registered tools that wrap the Knowledge and Decision engines.
     """
 
-    def __init__(self, settings: AgentSettings | None = None) -> None:
+    def __init__(
+        self,
+        settings: AgentSettings | None = None,
+        memory_manager: MemoryManager | None = None,
+    ) -> None:
         self.settings = settings or AgentSettings()
         self.settings.ensure_dirs()
         discover_tools(self.settings)
         self.store = TaskStore(self.settings)
         self.workflow_loader = WorkflowLoader(self.settings)
         self.agent_loader = AgentLoader(self.settings)
+        self.memory = memory_manager or MemoryManager()
 
     def create_task(
         self,
@@ -58,6 +65,12 @@ class ExecutionEngine:
             ),
         )
         task.context.task_id = task.task_id
+        bundle = self.memory.retrieval.retrieve_for_task(
+            task_id=task.task_id,
+            agent_id=agent_id,
+            workflow_id=workflow_id,
+        )
+        task.context.relevant_memories = bundle.to_context_dict()
         self.store.save_task(task)
         self.store.append_log(task.task_id, f"Task created: {task.task_id}")
         return task
@@ -101,6 +114,16 @@ class ExecutionEngine:
         self.store.save_task(task)
         self.store.append_log(task.task_id, f"Workflow started: {workflow.workflow_id}")
 
+        self.memory.sync_working(
+            task_id=task.task_id,
+            scope=f"workflow:{workflow.workflow_id}",
+            content={"input": task.input, "status": "running"},
+            metadata={
+                "agent_id": task.agent_id,
+                "workflow_id": workflow.workflow_id,
+            },
+        )
+
         agent = self.agent_loader.get_agent(task.agent_id) if task.agent_id else None
         allowed_tools = set(agent.tools) if agent else None
 
@@ -112,6 +135,7 @@ class ExecutionEngine:
                 task.status = TaskStatus.FAILED
                 task.completed_at = utc_now()
                 self.store.save_task(task)
+                self._record_workflow_memory(task, workflow, success=False)
                 duration_ms = int((time.perf_counter() - start) * 1000)
                 return ExecutionResult(
                     task_id=task.task_id,
@@ -128,6 +152,7 @@ class ExecutionEngine:
         task.completed_at = utc_now()
         self.store.save_task(task)
         self.store.append_log(task.task_id, "Workflow completed successfully")
+        self._record_workflow_memory(task, workflow, success=True)
 
         duration_ms = int((time.perf_counter() - start) * 1000)
         return ExecutionResult(
@@ -248,6 +273,7 @@ class ExecutionEngine:
             task_input=task.input,
             step_outputs=task.context.step_outputs,
             variables=task.context.variables,
+            memory=task.context.relevant_memories,
         )
         resolved_input = resolve_value(step.input, bindings)
 
@@ -265,3 +291,38 @@ class ExecutionEngine:
         invocation.completed_at = utc_now()
         invocation.error = result.error
         return invocation, result
+
+    def _record_workflow_memory(self, task: AgentTask, workflow: Workflow, *, success: bool) -> None:
+        """Record workflow execution as episodic memory and expire working context."""
+        from ai_os.memory.models import MemoryStatus, MemoryType, WorkingMemory
+
+        event_type = EpisodicEventType.SUCCESS if success else EpisodicEventType.FAILURE
+        title = f"{'Completed' if success else 'Failed'}: {workflow.name}"
+        summary = (
+            f"Workflow {workflow.workflow_id} {'completed' if success else 'failed'} "
+            f"for task {task.task_id}"
+        )
+        self.memory.create_episodic(
+            event_type=event_type,
+            title=title,
+            summary=summary,
+            content={
+                "workflow_id": workflow.workflow_id,
+                "steps_completed": list(task.context.step_outputs.keys()),
+                "output": task.output,
+                "error": task.error,
+            },
+            source_ref=task.task_id,
+            tags=[workflow.workflow_id],
+            metadata={"agent_id": task.agent_id, "workflow_id": workflow.workflow_id},
+        )
+
+        for record in self.memory.store.list_by_type(MemoryType.WORKING, status=MemoryStatus.ACTIVE):
+            if isinstance(record, WorkingMemory) and record.task_id == task.task_id:
+                self.memory.promote_working_to_episodic(
+                    record.memory_id,
+                    policy=PromotionPolicy.WORKFLOW_COMPLETION,
+                    title=title,
+                    summary=summary,
+                )
+                break
