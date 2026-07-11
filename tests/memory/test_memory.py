@@ -90,7 +90,7 @@ class TestPersistence:
             title="Done",
             summary="Completed",
         )
-        episodic = memory_manager.store.list_by_type(MemoryType.EPISODIC)
+        episodic = memory_manager.list_by_type(MemoryType.EPISODIC)
         assert len(episodic) == 1
         assert episodic[0].memory_type == MemoryType.EPISODIC
 
@@ -329,5 +329,5 @@ class TestAgentIntegration:
         result = engine.run_workflow("ep-flow", {})
         assert result.status == TaskStatus.COMPLETED
 
-        episodic = memory_manager.store.list_by_type(MemoryType.EPISODIC)
+        episodic = memory_manager.list_by_type(MemoryType.EPISODIC)
         assert any(e.source_ref == result.task_id for e in episodic)

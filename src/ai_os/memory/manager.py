@@ -10,6 +10,7 @@ from ai_os.memory.ids import new_memory_id
 from ai_os.memory.models import (
     EpisodicEventType,
     EpisodicMemory,
+    MemoryBundle,
     MemoryRecord,
     MemorySearchQuery,
     MemoryStatus,
@@ -151,6 +152,56 @@ class MemoryManager:
 
     def search(self, query: MemorySearchQuery) -> list[MemoryRecord]:
         return self.retrieval.search(query)
+
+    def retrieve_for_task(
+        self,
+        *,
+        task_id: str,
+        agent_id: str | None = None,
+        workflow_id: str | None = None,
+        tags: list[str] | None = None,
+    ) -> MemoryBundle:
+        """Load relevant memories for an executing task (public façade)."""
+        return self.retrieval.retrieve_for_task(
+            task_id=task_id,
+            agent_id=agent_id,
+            workflow_id=workflow_id,
+            tags=tags,
+        )
+
+    def list_by_type(
+        self,
+        memory_type: MemoryType,
+        *,
+        status: MemoryStatus | None = MemoryStatus.ACTIVE,
+    ) -> list[MemoryRecord]:
+        """List memories of a given type (public façade)."""
+        return self.store.list_by_type(memory_type, status=status)
+
+    def list_all(self, *, status: MemoryStatus | None = None) -> list[MemoryRecord]:
+        """List all memories, optionally filtered by status (public façade)."""
+        return self.store.list_all(status=status)
+
+    def promote_working_for_task(
+        self,
+        task_id: str,
+        *,
+        policy: PromotionPolicy = PromotionPolicy.WORKFLOW_COMPLETION,
+        approved: bool = False,
+        title: str | None = None,
+        summary: str | None = None,
+    ) -> PromotionResult | None:
+        """Promote active working memory for a task to episodic (public façade)."""
+        for record in self.store.list_by_type(MemoryType.WORKING, status=MemoryStatus.ACTIVE):
+            if isinstance(record, WorkingMemory) and record.task_id == task_id:
+                return self.promote_working_to_episodic(
+                    record.memory_id,
+                    policy=policy,
+                    approved=approved,
+                    title=title,
+                    summary=summary,
+                )
+        return None
 
     def archive(self, memory_id: str) -> MemoryRecord:
         record = self.store.get(memory_id)

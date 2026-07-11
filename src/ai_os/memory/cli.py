@@ -43,12 +43,12 @@ def register_memory_commands(app: typer.Typer) -> None:
             from ai_os.memory.models import MemoryStatus
 
             status = None if include_archived else MemoryStatus.ACTIVE
-            records = manager.store.list_by_type(mtype, status=status)
+            records = manager.list_by_type(mtype, status=status)
         else:
             from ai_os.memory.models import MemoryStatus
 
             status = None if include_archived else MemoryStatus.ACTIVE
-            records = manager.store.list_all(status=status)
+            records = manager.list_all(status=status)
 
         if not records:
             console.print("[yellow]No memories found[/yellow]")

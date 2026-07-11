@@ -14,6 +14,24 @@ Most AI tooling today is fragmented: chats in one place, notes in another, scrip
 4. **Local-first, cloud-optional** — Run on your machine by default; integrate external APIs and hosted stores when needed.
 5. **Auditability** — Prompts, templates, and ADRs are versioned; experiments are isolated and archivable.
 
+## Implemented Architecture (v0.3.x)
+
+```
+Knowledge Engine  →  Decision Engine  →  Agent Runtime  →  Automation (future)
+                            ↑                    ↑
+                         Memory System    (via MemoryManager façade)
+```
+
+| Layer | Package | Status |
+|-------|---------|--------|
+| Knowledge | `src/ai_os/knowledge/` | Complete (v0.1.0) |
+| Decision | `src/ai_os/decision/` | Complete (v0.2.0) |
+| Agent Runtime | `src/ai_os/agent/` | Complete (v0.3.0) |
+| Memory | `src/ai_os/memory/` | Complete (v0.3.0) |
+| Automation | — | Planned (Phase 4) |
+
+See [layer-boundaries.md](layer-boundaries.md) for dependency rules and [memory-system.md](memory-system.md) for memory tier design.
+
 ## Conceptual Architecture
 
 ```
@@ -60,34 +78,32 @@ The knowledge layer answers: **What does the system know, and how can it be retr
 - Incremental re-indexing
 - Hybrid search (keyword + semantic)
 
-### Memory Layer (`memory/`)
+### Memory Layer (`src/ai_os/memory/`)
 
-The memory layer answers: **What context persists across sessions, and under what rules?**
+The memory layer answers: **What happened before, and what experience persists?**
 
-Memory is **runtime state**, not canonical knowledge. It includes conversation history, working summaries, user preferences, and task state. Contents are **gitignored** by default to avoid leaking secrets or PII into version control.
+Memory is **runtime experience**, not canonical knowledge. Four independent types (working, episodic, semantic, procedural) are managed through the `MemoryManager` façade. Agent Runtime accesses memory only via this public API.
 
-**Future capabilities:**
+**Implemented capabilities:**
 
-- Tiered retention (working → session → long-term)
-- Summarization and compaction policies
-- Encryption at rest (via `ENCRYPTION_KEY` in `.env`)
-- Explicit promotion: memory → knowledge when something should be permanent
+- Tiered memory with automatic working-memory expiration
+- Staged promotion (Working → Episodic → Semantic)
+- Task-scoped retrieval injected into Agent Runtime context
+- CLI: `ai-os memory list|search|show|promote|archive|expire`
 
-### Decision Engine (`decision-engine/`)
+### Decision Engine (`src/ai_os/decision/`)
 
-The decision layer answers: **How does the system choose actions and produce structured outputs?**
+The decision layer answers: **What should we do?**
 
-| Asset | Location | Role |
-|-------|----------|------|
-| Prompts | `decision-engine/prompts/` | System and task prompts, versioned by name |
-| Templates | `decision-engine/templates/` | Output schemas, Jinja/Mustache shells, evaluation rubrics |
+Consumes `ContextBundle` from Knowledge; never performs retrieval itself. Six reasoning strategies, structured `DecisionResult` output, persistence to `memory/decisions/`.
 
-**Future capabilities:**
+### Agent Runtime (`src/ai_os/agent/`)
 
-- Prompt registry with semver or date versioning
-- Input/output JSON schemas
-- Evaluation harness against golden fixtures
-- Human-in-the-loop approval gates for high-risk decisions
+The agent layer answers: **How do we execute?**
+
+Orchestrates tools (Knowledge, Decision, filesystem, HTTP, datetime) via YAML workflows. Injects `MemoryBundle` at task creation. Never retrieves facts or reasons directly.
+
+**Future: Automation Layer** answers: **When should execution happen?**
 
 ### Experiments (`experiments/`)
 

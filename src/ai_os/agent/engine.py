@@ -65,7 +65,7 @@ class ExecutionEngine:
             ),
         )
         task.context.task_id = task.task_id
-        bundle = self.memory.retrieval.retrieve_for_task(
+        bundle = self.memory.retrieve_for_task(
             task_id=task.task_id,
             agent_id=agent_id,
             workflow_id=workflow_id,
@@ -293,9 +293,7 @@ class ExecutionEngine:
         return invocation, result
 
     def _record_workflow_memory(self, task: AgentTask, workflow: Workflow, *, success: bool) -> None:
-        """Record workflow execution as episodic memory and expire working context."""
-        from ai_os.memory.models import MemoryStatus, MemoryType, WorkingMemory
-
+        """Record workflow execution as episodic memory and promote working context."""
         event_type = EpisodicEventType.SUCCESS if success else EpisodicEventType.FAILURE
         title = f"{'Completed' if success else 'Failed'}: {workflow.name}"
         summary = (
@@ -317,12 +315,9 @@ class ExecutionEngine:
             metadata={"agent_id": task.agent_id, "workflow_id": workflow.workflow_id},
         )
 
-        for record in self.memory.store.list_by_type(MemoryType.WORKING, status=MemoryStatus.ACTIVE):
-            if isinstance(record, WorkingMemory) and record.task_id == task.task_id:
-                self.memory.promote_working_to_episodic(
-                    record.memory_id,
-                    policy=PromotionPolicy.WORKFLOW_COMPLETION,
-                    title=title,
-                    summary=summary,
-                )
-                break
+        self.memory.promote_working_for_task(
+            task.task_id,
+            policy=PromotionPolicy.WORKFLOW_COMPLETION,
+            title=title,
+            summary=summary,
+        )
