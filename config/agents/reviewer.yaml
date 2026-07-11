@@ -1,0 +1,13 @@
+agent_id: agt_reviewer
+name: Reviewer
+description: Retrieves knowledge and produces structured decisions.
+tools:
+  - knowledge_retrieve
+  - decision_make
+  - filesystem_write
+  - datetime_now
+permissions:
+  - knowledge:read
+  - decision:execute
+  - filesystem:write
+  - system:read

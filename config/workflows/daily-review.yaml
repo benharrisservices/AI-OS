@@ -1,0 +1,39 @@
+workflow_id: daily-review
+name: Daily Review
+description: >
+  Retrieve knowledge, make a decision, record the result, and write a notification.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: retrieve
+    name: Retrieve supporting knowledge
+    tool_name: knowledge_retrieve
+    input:
+      query: "{{input.topic}}"
+      top_k: 8
+
+  - step_id: decide
+    name: Make a structured decision
+    tool_name: decision_make
+    input:
+      question: "{{input.topic}}"
+      strategy: "{{input.strategy}}"
+
+  - step_id: timestamp
+    name: Capture timestamp
+    tool_name: datetime_now
+    input: {}
+
+  - step_id: record
+    name: Record decision output
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.decide.summary}}"
+
+  - step_id: notify
+    name: Write completion notification
+    tool_name: filesystem_write
+    input:
+      path: "{{input.notify_path}}"
+      content: "Daily review completed for {{input.topic}} at {{vars.iso}}"
