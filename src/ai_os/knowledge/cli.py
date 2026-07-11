@@ -9,8 +9,9 @@ from rich.console import Console
 from rich.table import Table
 
 from ai_os.knowledge.config import get_settings
-from ai_os.knowledge.models import SearchQuery
+from ai_os.knowledge.models import RetrievalQuery, SearchQuery
 from ai_os.knowledge.pipeline import KnowledgePipeline
+from ai_os.knowledge.retrieval import KnowledgeRetrieval, format_context_prompt
 from ai_os.knowledge.search import HybridSearch
 
 app = typer.Typer(help="AI-OS Knowledge Engine", no_args_is_help=True)
@@ -90,6 +91,51 @@ def search(
             hit.excerpt.replace("\n", " ")[:120],
         )
     console.print(table)
+
+
+@app.command("retrieve")
+def retrieve(
+    query: str = typer.Argument(..., help="Query to retrieve context for"),
+    top_k: int = typer.Option(8, help="Chunks before deduplication"),
+    mode: str = typer.Option("hybrid", help="hybrid | vector | keyword"),
+    retrieval_mode: str = typer.Option("context", help="search | context | expand_parent"),
+    max_tokens: int = typer.Option(4000, help="Context token budget"),
+    max_chunks_per_doc: int = typer.Option(2, help="Diversity across documents"),
+    show_prompt: bool = typer.Option(False, "--show-prompt", help="Print prompt-ready context"),
+) -> None:
+    """Assemble a citation-backed context bundle for RAG."""
+    settings = get_settings()
+    engine = KnowledgeRetrieval(settings)
+    bundle = engine.retrieve(
+        RetrievalQuery(
+            query=query,
+            top_k=top_k,
+            mode=mode,
+            retrieval_mode=retrieval_mode,
+            max_tokens=max_tokens,
+            max_chunks_per_doc=max_chunks_per_doc,
+        )
+    )
+
+    if not bundle.chunks:
+        console.print("[yellow]No context found[/yellow]")
+        raise typer.Exit(0)
+
+    if show_prompt:
+        console.print(format_context_prompt(bundle))
+        raise typer.Exit(0)
+
+    console.print(
+        f"[bold]{len(bundle.chunks)} chunk(s)[/bold] · "
+        f"~{bundle.token_estimate} tokens · {bundle.retrieval_metadata.latency_ms} ms"
+    )
+    for citation, chunk in zip(bundle.citations, bundle.chunks, strict=True):
+        console.print(
+            f"\n[cyan]{citation.cite_key}[/cyan] [bold]{citation.title}[/bold] "
+            f"([dim]{chunk.heading_path}[/dim]) score={chunk.score:.4f}"
+        )
+        console.print(f"  {chunk.text.replace(chr(10), ' ')[:280]}")
+        console.print(f"  [dim]source: {citation.source_uri}[/dim]")
 
 
 @app.command("status")

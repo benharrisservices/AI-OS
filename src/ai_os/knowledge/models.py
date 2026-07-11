@@ -205,3 +205,46 @@ class SearchQuery(BaseModel):
     mode: str = "hybrid"
     top_k: int = 10
     filters: dict[str, Any] = Field(default_factory=dict)
+    include_parents: bool = False
+
+
+class RetrievalQuery(BaseModel):
+    query: str
+    mode: str = "hybrid"
+    top_k: int = 8
+    filters: dict[str, Any] = Field(default_factory=dict)
+    retrieval_mode: str = "context"  # search | context | expand_parent
+    max_tokens: int = 4000
+    max_chunks_per_doc: int = 2
+    expand_parents: bool = True
+
+
+class RetrievedChunk(BaseModel):
+    chunk_id: str
+    doc_id: str
+    text: str
+    score: float
+    heading_path: str
+    source_uri: str
+
+
+class Citation(BaseModel):
+    cite_key: str
+    chunk_id: str
+    title: str
+    source_uri: str
+    excerpt: str
+
+
+class RetrievalMetadata(BaseModel):
+    search_mode: str
+    rerank_enabled: bool = False
+    latency_ms: int = 0
+
+
+class ContextBundle(BaseModel):
+    query: str
+    chunks: list[RetrievedChunk] = Field(default_factory=list)
+    citations: list[Citation] = Field(default_factory=list)
+    token_estimate: int = 0
+    retrieval_metadata: RetrievalMetadata
