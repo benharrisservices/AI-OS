@@ -26,6 +26,31 @@ from ai_os.agent.store import TaskStore
 from ai_os.agent.tools import discover_tools, get_tool, list_tools, register_tool
 from ai_os.agent.tools.base import BaseTool
 from ai_os.agent.workflows import AgentLoader, WorkflowLoader
+from ai_os.memory.config import MemorySettings
+from ai_os.memory.manager import MemoryManager
+
+
+@pytest.fixture
+def memory_settings(tmp_path: Path) -> MemorySettings:
+    base = tmp_path / "memory"
+    settings = MemorySettings(
+        MEMORY_WORKING_DIR=base / "working",
+        MEMORY_EPISODIC_DIR=base / "episodic",
+        MEMORY_SEMANTIC_DIR=base / "semantic",
+        MEMORY_PROCEDURAL_DIR=base / "procedural",
+        MEMORY_WORKING_TTL_MINUTES=30,
+    )
+    settings.ensure_dirs()
+    return settings
+
+
+@pytest.fixture
+def memory_manager(memory_settings: MemorySettings) -> MemoryManager:
+    return MemoryManager(memory_settings)
+
+
+def _engine(agent_settings: AgentSettings, memory_manager: MemoryManager) -> ExecutionEngine:
+    return ExecutionEngine(agent_settings, memory_manager=memory_manager)
 
 
 @pytest.fixture
@@ -168,11 +193,12 @@ class TestExecutionEngine:
     def test_workflow_execution(
         self,
         agent_settings: AgentSettings,
+        memory_manager: MemoryManager,
         sample_workflow: Workflow,
         sample_agent: Agent,
     ) -> None:
         discover_tools(agent_settings)
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         output_path = str(agent_settings.tasks_dir / "result.txt")
         result = engine.run_workflow("test-flow", {"output_path": output_path})
 
@@ -184,11 +210,12 @@ class TestExecutionEngine:
     def test_task_state_transitions(
         self,
         agent_settings: AgentSettings,
+        memory_manager: MemoryManager,
         sample_workflow: Workflow,
         sample_agent: Agent,
     ) -> None:
         discover_tools(agent_settings)
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         task = engine.create_task(workflow_id="test-flow", input_data={"output_path": "/tmp/x"})
         assert task.status == TaskStatus.PENDING
 
@@ -203,11 +230,12 @@ class TestExecutionEngine:
     def test_execution_logging(
         self,
         agent_settings: AgentSettings,
+        memory_manager: MemoryManager,
         sample_workflow: Workflow,
         sample_agent: Agent,
     ) -> None:
         discover_tools(agent_settings)
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow(
             "test-flow",
             {"output_path": str(agent_settings.tasks_dir / "logged.txt")},
@@ -221,11 +249,12 @@ class TestExecutionEngine:
     def test_tool_invocation_persisted(
         self,
         agent_settings: AgentSettings,
+        memory_manager: MemoryManager,
         sample_workflow: Workflow,
         sample_agent: Agent,
     ) -> None:
         discover_tools(agent_settings)
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow(
             "test-flow",
             {"output_path": str(agent_settings.tasks_dir / "inv.txt")},
@@ -237,7 +266,9 @@ class TestExecutionEngine:
 
 
 class TestRetries:
-    def test_step_retries_until_success(self, agent_settings: AgentSettings) -> None:
+    def test_step_retries_until_success(
+        self, agent_settings: AgentSettings, memory_manager: MemoryManager
+    ) -> None:
         flaky = FlakyTool()
         register_tool(flaky)
 
@@ -269,7 +300,7 @@ class TestRetries:
         path = agent_settings.workflows_dir / "retry-flow.yaml"
         path.write_text(yaml.dump(workflow.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
 
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow("retry-flow", {})
         assert result.status == TaskStatus.COMPLETED
         assert flaky.attempts == 2
@@ -280,7 +311,9 @@ class TestRetries:
 
 
 class TestFailureRecovery:
-    def test_unknown_tool_fails_workflow(self, agent_settings: AgentSettings, sample_agent: Agent) -> None:
+    def test_unknown_tool_fails_workflow(
+        self, agent_settings: AgentSettings, memory_manager: MemoryManager, sample_agent: Agent
+    ) -> None:
         discover_tools(agent_settings)
         workflow = Workflow(
             workflow_id="bad-tool",
@@ -294,12 +327,14 @@ class TestFailureRecovery:
         path = agent_settings.workflows_dir / "bad-tool.yaml"
         path.write_text(yaml.dump(workflow.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
 
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow("bad-tool", {})
         assert result.status == TaskStatus.FAILED
         assert "Unknown tool" in (result.error or "")
 
-    def test_skip_on_failure(self, agent_settings: AgentSettings, sample_agent: Agent) -> None:
+    def test_skip_on_failure(
+        self, agent_settings: AgentSettings, memory_manager: MemoryManager, sample_agent: Agent
+    ) -> None:
         discover_tools(agent_settings)
         workflow = Workflow(
             workflow_id="skip-flow",
@@ -321,12 +356,14 @@ class TestFailureRecovery:
         path = agent_settings.workflows_dir / "skip-flow.yaml"
         path.write_text(yaml.dump(workflow.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
 
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow("skip-flow", {})
         assert result.status == TaskStatus.COMPLETED
         assert result.steps_completed == ["ts"]
 
-    def test_agent_tool_permission_denied(self, agent_settings: AgentSettings) -> None:
+    def test_agent_tool_permission_denied(
+        self, agent_settings: AgentSettings, memory_manager: MemoryManager
+    ) -> None:
         discover_tools(agent_settings)
         restricted = Agent(
             agent_id="agt_restricted",
@@ -350,7 +387,7 @@ class TestFailureRecovery:
         wf_path = agent_settings.workflows_dir / "denied.yaml"
         wf_path.write_text(yaml.dump(workflow.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
 
-        engine = ExecutionEngine(agent_settings)
+        engine = _engine(agent_settings, memory_manager)
         result = engine.run_workflow("denied", {})
         assert result.status == TaskStatus.FAILED
         assert "not permitted" in (result.error or "").lower()
