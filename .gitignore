@@ -1,0 +1,313 @@
+# =============================================================================
+# AI-OS — comprehensive .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# macOS
+# -----------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+pypackages/
+celerybeat-schedule
+celerybeat.pid
+*.cover
+*.py,cover
+.hypothesis/
+cover/
+instance/
+.webassets-cache
+.scrapy
+docs/_build/
+target/
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+.python-version
+Pipfile.lock
+poetry.lock
+uv.lock
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# -----------------------------------------------------------------------------
+# Node.js
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.parcel-cache
+.next/
+out/
+.nuxt/
+dist/
+.cache/
+.svelte-kit/
+.turbo/
+.vercel
+.netlify
+
+# -----------------------------------------------------------------------------
+# Virtual environments
+# -----------------------------------------------------------------------------
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.virtualenv/
+.virtualenvs/
+conda-meta/
+.conda/
+
+# -----------------------------------------------------------------------------
+# Environment variables & secrets
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.secrets/
+credentials/
+credentials.json
+service-account*.json
+*.credentials
+.aws/
+.gcp/
+.azure/
+
+# -----------------------------------------------------------------------------
+# Cursor & IDE
+# -----------------------------------------------------------------------------
+.cursor/
+!.cursor/rules/
+!.cursor/skills/
+!.cursor/skills-cursor/
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# -----------------------------------------------------------------------------
+# Logs
+# -----------------------------------------------------------------------------
+logs/
+*.log
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------------------------------------------------------
+# Build artifacts
+# -----------------------------------------------------------------------------
+build/
+dist/
+out/
+target/
+*.o
+*.a
+*.lib
+*.dll
+*.exe
+*.dylib
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+.bundle/
+vendor/
+
+# -----------------------------------------------------------------------------
+# AI models & weights
+# -----------------------------------------------------------------------------
+models/
+*.gguf
+*.ggml
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.mlmodel
+*.h5
+*.keras
+*.ckpt
+*.pb
+*.tflite
+*.mar
+*.ollama
+checkpoints/
+weights/
+embeddings-cache/
+.huggingface/
+.cache/huggingface/
+transformers_cache/
+openai-cache/
+anthropic-cache/
+
+# -----------------------------------------------------------------------------
+# Databases
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+data/
+databases/
+*.sql.backup
+*.dump
+pgdata/
+mysql-data/
+redis-data/
+chroma/
+qdrant/
+weaviate/
+lancedb/
+faiss/
+*.lmdb
+*.mdb
+
+# -----------------------------------------------------------------------------
+# Temporary files
+# -----------------------------------------------------------------------------
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.cache/
+.sass-cache/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# -----------------------------------------------------------------------------
+# Memory & runtime state (AI-OS specific)
+# -----------------------------------------------------------------------------
+memory/**
+!memory/README.md
+!memory/.gitkeep
+
+# -----------------------------------------------------------------------------
+# Knowledge pipeline artifacts (large / generated)
+# -----------------------------------------------------------------------------
+knowledge/processed/**
+!knowledge/processed/README.md
+!knowledge/processed/.gitkeep
+knowledge/index/**
+!knowledge/index/README.md
+!knowledge/index/.gitkeep
+knowledge/raw/**
+!knowledge/raw/README.md
+!knowledge/raw/.gitkeep
+
+# -----------------------------------------------------------------------------
+# Experiment outputs
+# -----------------------------------------------------------------------------
+experiments/**/output/
+experiments/**/artifacts/
+experiments/**/.cache/
+
+# -----------------------------------------------------------------------------
+# OS & misc
+# -----------------------------------------------------------------------------
+*.orig
+*.rej
+.directory
