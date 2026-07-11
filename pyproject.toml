@@ -28,7 +28,7 @@ dev = [
 ]
 
 [project.scripts]
-ai-os = "ai_os.knowledge.cli:app"
+ai-os = "ai_os.cli:app"
 
 [build-system]
 requires = ["hatchling"]
