@@ -41,16 +41,16 @@ def test_pipeline_ingest_and_search(mock_embed, pipeline: KnowledgePipeline) -> 
 
 
 @patch("ai_os.knowledge.embedding.EmbeddingService.embed_texts", side_effect=_fake_embeddings)
-def test_pipeline_search_ultra_mobile(mock_embed, pipeline: KnowledgePipeline) -> None:
+def test_pipeline_search_net_metering(mock_embed, pipeline: KnowledgePipeline) -> None:
     fixture = Path("tests/fixtures/barbados-solar.md")
     pipeline.ingest_file(fixture)
 
     from ai_os.knowledge.models import SearchQuery
     from ai_os.knowledge.search import HybridSearch
 
-    hits = HybridSearch(pipeline.settings).search(SearchQuery(query="Ultra Mobile", top_k=5))
+    hits = HybridSearch(pipeline.settings).search(SearchQuery(query="net metering", top_k=5))
     assert hits
-    assert any("Ultra Mobile" in hit.excerpt for hit in hits)
+    assert any("net metering" in hit.excerpt.lower() for hit in hits)
 
 
 @patch("ai_os.knowledge.embedding.EmbeddingService.embed_texts", side_effect=_fake_embeddings)

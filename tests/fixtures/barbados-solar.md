@@ -8,7 +8,7 @@ The government supports rooftop solar installations for residential homes.
 ## Incentives
 
 Solar tax credits and net metering make Barbados solar attractive for homeowners.
-Ultra Mobile connectivity helps field technicians coordinate installations.
+Project coordination tools help field teams schedule installations efficiently.
 
 ## Kickstarter Campaign
 
