@@ -53,10 +53,16 @@ class KnowledgeSettings(BaseSettings):
     url_max_redirects: int = 5
     url_user_agent: str = "AI-OS-KnowledgeBot/1.0"
 
+    # Watch / maintenance
+    knowledge_watch_dir: Path = Field(default=Path("./knowledge/raw/inbox"), alias="KNOWLEDGE_WATCH_DIR")
+    knowledge_backup_dir: Path = Field(default=Path("./knowledge/backups"), alias="KNOWLEDGE_BACKUP_DIR")
+    watch_debounce_seconds: float = 2.0
+
     def ensure_dirs(self) -> None:
         for path in (
             self.knowledge_raw_dir,
             self.knowledge_raw_dir / ".registry",
+            self.knowledge_raw_dir / "inbox",
             self.knowledge_processed_dir,
             self.knowledge_processed_dir / ".catalog",
             self.knowledge_processed_dir / ".jobs",
@@ -64,6 +70,7 @@ class KnowledgeSettings(BaseSettings):
             self.knowledge_index_dir / "embeddings" / "cache",
             self.knowledge_index_dir / "keyword",
             self.vector_store_path,
+            self.knowledge_backup_dir,
         ):
             path.mkdir(parents=True, exist_ok=True)
 
