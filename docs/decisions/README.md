@@ -35,4 +35,6 @@ What else we evaluated and why we passed.
 
 ## Index
 
-_No ADRs yet — foundation phase._
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-001](ADR-001-knowledge-engine.md) | Knowledge Engine Architecture | accepted |

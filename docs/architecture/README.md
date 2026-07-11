@@ -5,6 +5,7 @@ Technical design artifacts for AI-OS: how components connect, what each layer ow
 ## Key documents
 
 - [system-overview.md](system-overview.md) — end-to-end architecture and evolution phases
+- [knowledge-engine.md](knowledge-engine.md) — Phase 1 Knowledge Engine design (ingestion, indexing, retrieval)
 
 ## What belongs here
 

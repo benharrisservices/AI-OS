@@ -17,8 +17,16 @@ raw/  →  processed/  →  index/
 ## Guidelines
 
 - **Raw** material may be large or sensitive — it is gitignored except this README and `.gitkeep`.
-- **Processed** output should use documented schemas (to be defined in Phase 1).
+- **Processed** output uses the schemas in [schema.md](schema.md) and [metadata-schema.md](metadata-schema.md).
 - **Index** artifacts are generated; never commit model weights or full databases.
+
+## Phase 1 design docs
+
+| Document | Contents |
+|----------|----------|
+| [pipeline.md](pipeline.md) | Stage-by-stage ingestion and indexing jobs |
+| [schema.md](schema.md) | On-disk layouts and JSON record shapes |
+| [metadata-schema.md](metadata-schema.md) | Field semantics, filters, and citations |
 
 ## Configuration
 
@@ -26,4 +34,6 @@ See [.env.example](../.env.example) variables prefixed with `KNOWLEDGE_` and `VE
 
 ## Related docs
 
+- [docs/architecture/knowledge-engine.md](../docs/architecture/knowledge-engine.md)
 - [docs/architecture/system-overview.md](../docs/architecture/system-overview.md)
+- [docs/decisions/ADR-001-knowledge-engine.md](../docs/decisions/ADR-001-knowledge-engine.md)
