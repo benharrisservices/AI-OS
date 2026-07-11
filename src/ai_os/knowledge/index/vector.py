@@ -21,9 +21,32 @@ class VectorIndex:
             metadata={"hnsw:space": "cosine"},
         )
 
+    def count(self) -> int:
+        return self.collection.count()
+
+    def list_ids(self) -> list[str]:
+        if self.collection.count() == 0:
+            return []
+        result = self.collection.get(include=[])
+        return list(result.get("ids") or [])
+
     def delete_doc(self, doc_id: str) -> None:
         try:
             self.collection.delete(where={"doc_id": doc_id})
+        except Exception:
+            pass
+
+    def delete_source(self, source_id: str) -> None:
+        try:
+            self.collection.delete(where={"source_id": source_id})
+        except Exception:
+            pass
+
+    def delete_chunks(self, chunk_ids: list[str]) -> None:
+        if not chunk_ids:
+            return
+        try:
+            self.collection.delete(ids=chunk_ids)
         except Exception:
             pass
 

@@ -182,6 +182,7 @@ class IndexManifest(BaseModel):
     document_count: int = 0
     chunk_count: int = 0
     child_chunk_count: int = 0
+    embedding_count: int = 0
     last_full_rebuild_at: datetime | None = None
     last_incremental_at: datetime | None = None
     created_at: datetime = Field(default_factory=utc_now)
@@ -248,3 +249,43 @@ class ContextBundle(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
     token_estimate: int = 0
     retrieval_metadata: RetrievalMetadata
+
+
+class ProcessingState(BaseModel):
+    schema_version: str = "1.0"
+    doc_id: str
+    source_id: str
+    source_fingerprint: str
+    pipeline_version: str
+    chunk_count: int = 0
+    child_chunk_count: int = 0
+    last_processed_at: datetime = Field(default_factory=utc_now)
+
+
+class IntegrityIssue(BaseModel):
+    severity: str  # error | warning | info
+    code: str
+    message: str
+    resource_id: str | None = None
+    repairable: bool = False
+
+
+class HealthReport(BaseModel):
+    healthy: bool
+    document_count: int = 0
+    chunk_count: int = 0
+    child_chunk_count: int = 0
+    embedding_count: int = 0
+    vector_index_count: int = 0
+    keyword_index_count: int = 0
+    source_count: int = 0
+    storage_bytes: int = 0
+    last_ingest_at: datetime | None = None
+    last_reindex_at: datetime | None = None
+    ollama_available: bool = False
+    embedding_model: str = ""
+    embedding_provider: str = ""
+    vector_store: str = ""
+    warnings: list[str] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    issues: list[IntegrityIssue] = Field(default_factory=list)

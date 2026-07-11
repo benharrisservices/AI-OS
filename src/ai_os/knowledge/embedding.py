@@ -66,7 +66,9 @@ class EmbeddingService:
         child_chunks = [c for c in chunks if c.chunk_level.value == "child"]
         if not child_chunks:
             child_chunks = chunks
+        return self.embed_chunk_list(child_chunks)
 
+    def embed_chunk_list(self, chunks: list[ChunkRecord]) -> list[EmbeddingRecord]:
         records: list[EmbeddingRecord] = []
         batch: list[ChunkRecord] = []
         batch_texts: list[str] = []
@@ -93,7 +95,7 @@ class EmbeddingService:
             batch = []
             batch_texts = []
 
-        for chunk in child_chunks:
+        for chunk in chunks:
             cached = self._load_cache(chunk.content_hash)
             if cached is not None:
                 records.append(
@@ -115,6 +117,15 @@ class EmbeddingService:
                 flush()
         flush()
         return records
+
+    def purge_cache_hashes(self, content_hashes: list[str]) -> int:
+        removed = 0
+        for content_hash in content_hashes:
+            path = self._cache_path(content_hash)
+            if path.exists():
+                path.unlink()
+                removed += 1
+        return removed
 
     def embed_query(self, query: str) -> list[float]:
         cached = self._load_cache(f"query:{query}")
