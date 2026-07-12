@@ -104,19 +104,20 @@ class VectorIndex:
         for chunk_id, distance, document, metadata in zip(
             ids, distances, documents, metadatas, strict=True
         ):
+            meta = metadata or {}
             score = 1.0 - float(distance)
             excerpt = (document or "")[:240]
             hits.append(
                 SearchHit(
                     chunk_id=chunk_id,
-                    doc_id=metadata.get("doc_id", ""),
-                    source_id=metadata.get("source_id", ""),
+                    doc_id=meta.get("doc_id", ""),
+                    source_id=meta.get("source_id", ""),
                     score=score,
                     scores={"vector": score},
-                    title=metadata.get("title", ""),
-                    heading_path=metadata.get("heading_path", ""),
+                    title=meta.get("title", ""),
+                    heading_path=meta.get("heading_path", ""),
                     excerpt=excerpt,
-                    source_uri=metadata.get("source_id", ""),
+                    source_uri=meta.get("source_id", ""),
                 )
             )
         return hits
