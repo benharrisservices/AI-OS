@@ -1,5 +1,8 @@
 """Integration tests."""
 
+import os
+from unittest.mock import patch
+
 from ai_os.integrations.builtin import register_builtin_providers
 from ai_os.integrations.registry import discover_providers, get_provider, health_check_all, list_providers
 from ai_os.integrations.models import ProviderStatus
@@ -25,8 +28,14 @@ class TestProviderRegistry:
         discover_providers()
         openai = get_provider("openai")
         assert openai is not None
-        health = openai.health_check()
-        assert health.status in (ProviderStatus.NOT_CONFIGURED, ProviderStatus.HEALTHY)
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("OPENAI_API_KEY", None)
+            health = openai.health_check()
+        assert health.status in (
+            ProviderStatus.NOT_CONFIGURED,
+            ProviderStatus.MISSING_CREDENTIALS,
+            ProviderStatus.HEALTHY,
+        )
 
     def test_health_check_all(self) -> None:
         results = health_check_all()

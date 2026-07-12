@@ -47,7 +47,7 @@ class TestHttpProviders:
         with patch.dict(os.environ, {"GMAIL_CLIENT_ID": "id", "GMAIL_CLIENT_SECRET": "secret"}, clear=False):
             os.environ.pop("GOOGLE_ACCESS_TOKEN", None)
             health = provider.health_check()
-        assert health.status in (ProviderStatus.NOT_CONFIGURED, ProviderStatus.DEGRADED)
+        assert health.status == ProviderStatus.MISSING_CREDENTIALS
 
     def test_invoke_error_message(self) -> None:
         provider = OpenAIProvider()

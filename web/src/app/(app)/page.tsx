@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BackendUnavailable } from "@/components/layout/backend-unavailable";
 import Link from "next/link";
 
 function formatBytes(n: number) {
@@ -27,10 +28,11 @@ function formatBytes(n: number) {
 
 export default function DashboardPage() {
   const qc = useQueryClient();
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["dashboard"],
     queryFn: api.dashboard,
-    refetchInterval: 60_000,
+    refetchInterval: (query) => (query.state.error ? 5_000 : 60_000),
+    retry: 2,
   });
 
   const runWorkflow = useMutation({
@@ -57,15 +59,10 @@ export default function DashboardPage() {
 
   if (error || !data) {
     return (
-      <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6">
-        <p className="font-medium text-destructive">Cannot reach sedr API</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Start the API: <code className="text-xs">uv run ai-os-api</code>
-        </p>
-        <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-          Retry
-        </Button>
-      </div>
+      <BackendUnavailable
+        onRetry={() => refetch()}
+        isRetrying={isFetching}
+      />
     );
   }
 

@@ -8,7 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function statusColor(status: string) {
   if (status === "healthy") return "default";
-  if (status === "not_configured") return "secondary";
+  if (status === "not_configured" || status === "missing_credentials") return "secondary";
+  if (status === "disabled") return "outline";
+  if (status === "authentication_failed" || status === "network_error") return "destructive";
   return "outline";
 }
 

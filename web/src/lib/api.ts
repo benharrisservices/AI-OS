@@ -1,6 +1,11 @@
-const API_BASE =
-  process.env.NEXT_PUBLIC_AI_OS_API_URL?.replace(/\/$/, "") ||
-  "http://127.0.0.1:8741";
+const API_BASE = (() => {
+  const fromEnv = process.env.NEXT_PUBLIC_AI_OS_API_URL?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === "production") {
+    return "https://api.sedr.ca";
+  }
+  return "http://127.0.0.1:8741";
+})();
 
 export class ApiError extends Error {
   constructor(

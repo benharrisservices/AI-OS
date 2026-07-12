@@ -3,7 +3,12 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+startCommand = "uv run uvicorn ai_os.api.app:app --host 0.0.0.0 --port $PORT --log-level ${AI_OS_LOG_LEVEL:-info} --timeout-graceful-shutdown 30"
 healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 numReplicas = 1
+
+# Attach a persistent volume in the Railway dashboard:
+#   Mount path: /data
+#   Set AI_OS_DATA_DIR=/data (default in Dockerfile)

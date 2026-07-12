@@ -10,9 +10,14 @@ from pydantic import BaseModel, Field
 
 class ProviderStatus(str, Enum):
     HEALTHY = "healthy"
-    DEGRADED = "degraded"
-    UNAVAILABLE = "unavailable"
+    AUTHENTICATION_FAILED = "authentication_failed"
+    MISSING_CREDENTIALS = "missing_credentials"
+    NETWORK_ERROR = "network_error"
+    DISABLED = "disabled"
     NOT_CONFIGURED = "not_configured"
+    # Legacy aliases kept for backward compatibility in API consumers.
+    DEGRADED = "authentication_failed"
+    UNAVAILABLE = "network_error"
 
 
 class ProviderCapability(BaseModel):

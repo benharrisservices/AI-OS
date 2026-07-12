@@ -65,6 +65,8 @@ class OllamaProvider(ProviderAdapter):
         try:
             with httpx.Client(timeout=5.0) as client:
                 return client.get(f"{self._host()}/api/tags").status_code == 200
+        except (httpx.ConnectError, httpx.TimeoutException):
+            raise
         except Exception:
             return False
 
@@ -311,6 +313,30 @@ class _GoogleProvider(HttpProvider):
             settings={"oauth_configured": oauth_present},
         )
 
+    def health_check(self) -> ProviderHealth:
+        from ai_os.integrations.models import ProviderHealth, ProviderStatus
+
+        config = self.configure()
+        if not config.enabled:
+            return ProviderHealth(
+                provider_id=self.provider_id,
+                status=ProviderStatus.NOT_CONFIGURED,
+                message="Not configured",
+            )
+        if not config.credentials_present:
+            if config.settings.get("oauth_configured"):
+                return ProviderHealth(
+                    provider_id=self.provider_id,
+                    status=ProviderStatus.MISSING_CREDENTIALS,
+                    message="Missing access token — run: ai-os auth google",
+                )
+            return ProviderHealth(
+                provider_id=self.provider_id,
+                status=ProviderStatus.MISSING_CREDENTIALS,
+                message="Missing credentials",
+            )
+        return super().health_check()
+
     def _google_token(self) -> str | None:
         for key in self._google_token_keys:
             if val := os.environ.get(key):
@@ -514,7 +540,12 @@ class BrowserProvider(ProviderAdapter):
 
     def configure(self) -> ProviderConfig:
         enabled = os.environ.get("BROWSER_AUTOMATION_ENABLED", "false").lower() == "true"
-        return ProviderConfig(provider_id=self.provider_id, enabled=enabled, credentials_present=True)
+        return ProviderConfig(
+            provider_id=self.provider_id,
+            enabled=enabled,
+            credentials_present=True,
+            settings={"disabled": not enabled},
+        )
 
     def authenticate(self) -> bool:
         return self.configure().enabled

@@ -38,7 +38,14 @@ def register_integration_commands(app: typer.Typer) -> None:
         table.add_column("Latency", justify="right")
         table.add_column("Message")
         for h in results:
-            color = {"healthy": "green", "not_configured": "dim"}.get(h.status.value, "yellow")
+            color = {
+                "healthy": "green",
+                "not_configured": "dim",
+                "missing_credentials": "yellow",
+                "authentication_failed": "red",
+                "network_error": "red",
+                "disabled": "dim",
+            }.get(h.status.value, "yellow")
             table.add_row(h.provider_id, f"[{color}]{h.status.value}[/{color}]", str(h.latency_ms), h.message[:40])
         console.print(table)
 

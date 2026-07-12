@@ -20,11 +20,13 @@ from ai_os.api.routers import (
     settings,
     workflows,
 )
+from ai_os.api.startup import lifespan
 
 app = FastAPI(
     title="sedr API",
     description="Thin HTTP wrapper over existing AI-OS services",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 _cors_origins = [
@@ -62,4 +64,4 @@ app.include_router(imports.router, prefix="/api/v1")
 
 @app.get("/api/v1/health")
 def health() -> dict:
-    return {"status": "ok", "service": "ai-os-api"}
+    return {"status": "ok", "service": "sedr-api"}
