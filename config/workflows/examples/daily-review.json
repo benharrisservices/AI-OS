@@ -1,6 +1,6 @@
 {
   "topic": "What did I accomplish today and what carries over to tomorrow?",
-  "strategy": "reflective",
+  "strategy": "analytical",
   "output_path": "./memory/reviews/daily-{{date}}.md",
   "notify_path": "./memory/reviews/daily-{{date}}-done.txt"
 }

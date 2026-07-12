@@ -1,0 +1,4 @@
+{
+  "inbox_query": "recent inbox items requiring triage",
+  "output_path": "./memory/inbox/triage-{{date}}.md"
+}

@@ -38,8 +38,14 @@ class TestKnowledgeImporter:
         assert second.skipped == 1
 
     def test_import_chats_json(self, tmp_path: Path) -> None:
-        chat = tmp_path / "export.json"
-        chat.write_text('[{"role": "user", "content": "Hello"}, {"role": "assistant", "content": "Hi"}]', encoding="utf-8")
+        import uuid
+
+        unique = uuid.uuid4().hex[:8]
+        chat = tmp_path / f"export-{unique}.json"
+        chat.write_text(
+            f'[{{"role": "user", "content": "Hello {unique}"}}, {{"role": "assistant", "content": "Hi"}}]',
+            encoding="utf-8",
+        )
         settings = KnowledgeSettings(
             knowledge_raw_dir=tmp_path / "raw",
             knowledge_processed_dir=tmp_path / "processed",

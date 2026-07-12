@@ -18,7 +18,7 @@ from ai_os.agent.models import (
     Workflow,
     utc_now,
 )
-from ai_os.agent.resolve import build_bindings, resolve_value
+from ai_os.agent.resolve import build_bindings, init_workflow_variables, resolve_value
 from ai_os.agent.store import TaskStore
 from ai_os.agent.tools import discover_tools, get_tool
 from ai_os.agent.workflows import AgentLoader, WorkflowLoader
@@ -133,6 +133,8 @@ class ExecutionEngine:
                 "workflow_id": workflow.workflow_id,
             },
         )
+
+        task.context.variables = init_workflow_variables(task.input)
 
         agent = self.agent_loader.get_agent(task.agent_id) if task.agent_id else None
         allowed_tools = set(agent.tools) if agent else None

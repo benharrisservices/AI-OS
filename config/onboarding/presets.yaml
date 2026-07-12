@@ -1,0 +1,99 @@
+# Knowledge import presets — used by `ai-os onboarding`
+# Paths are suggestions; you provide your own paths at import time.
+
+presets:
+  - id: ai-os-repo
+    name: AI-OS Repository Docs
+    order: 1
+    source_type: folder
+    suggested_path: ./docs
+    tags: [ai-os, reference]
+    description: Architecture and project documentation from this repository.
+
+  - id: git-repo
+    name: Git Repository
+    order: 2
+    source_type: git
+    suggested_path: .
+    tags: [git-import]
+    description: Local git repository — imports supported files (md, txt, pdf, docx).
+
+  - id: business-projects
+    name: Business Projects
+    order: 3
+    source_type: folder
+    suggested_path: ~/Projects
+    tags: [business]
+    description: Client or business project folders.
+
+  - id: university
+    name: University Materials
+    order: 4
+    source_type: folder
+    suggested_path: ~/University
+    tags: [university]
+    description: Course notes, syllabi, and academic documents.
+
+  - id: markdown-notes
+    name: Markdown Notes
+    order: 5
+    source_type: folder
+    suggested_path: ~/Notes
+    tags: [notes, personal]
+    description: Personal markdown notes and journals.
+
+  - id: pdfs
+    name: PDF Documents
+    order: 6
+    source_type: folder
+    suggested_path: ~/Documents/PDFs
+    tags: [pdf-import]
+    description: Folder of PDF files.
+
+  - id: docx
+    name: Word Documents
+    order: 7
+    source_type: folder
+    suggested_path: ~/Documents
+    tags: [docx-import]
+    description: Folder containing .docx files.
+
+  - id: exported-chats
+    name: Exported Chats
+    order: 8
+    source_type: chats
+    suggested_path: ~/Exports
+    tags: [chats]
+    description: JSON or text exports from ChatGPT, Claude, etc.
+
+  - id: travel-folders
+    name: Travel Research
+    order: 9
+    source_type: folder
+    suggested_path: ~/Travel
+    tags: [travel]
+    description: Trip planning folders with notes and PDFs.
+
+  - id: product-designs
+    name: Product Designs
+    order: 10
+    source_type: folder
+    suggested_path: ~/Designs
+    tags: [design]
+    description: Product specs and design documents.
+
+  - id: personal-documents
+    name: Personal Documents
+    order: 11
+    source_type: folder
+    suggested_path: ~/Documents/Personal
+    tags: [personal]
+    description: General personal reference documents.
+
+  - id: legal-documents
+    name: Legal Documents
+    order: 12
+    source_type: folder
+    suggested_path: ~/Documents/Legal
+    tags: [legal]
+    description: Contracts and legal PDFs — import selectively.

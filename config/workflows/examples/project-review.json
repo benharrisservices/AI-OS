@@ -1,0 +1,4 @@
+{
+  "project_name": "Project name",
+  "output_path": "./memory/projects/{{project_name_slug}}-review-{{date}}.md"
+}

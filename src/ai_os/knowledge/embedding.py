@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -19,6 +20,8 @@ class EmbeddingService:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _cache_path(self, content_hash: str) -> Path:
+        if len(content_hash) > 120:
+            content_hash = hashlib.sha256(content_hash.encode("utf-8")).hexdigest()
         safe = content_hash.replace(":", "_")
         return self.cache_dir / f"{safe}.json"
 

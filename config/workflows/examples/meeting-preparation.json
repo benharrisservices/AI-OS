@@ -1,6 +1,5 @@
 {
-  "meeting_title": "Team standup",
-  "attendees": ["team"],
-  "agenda": "Status updates and blockers",
-  "output_path": "./memory/meetings/{{meeting_slug}}-prep.md"
+  "meeting_topic": "Meeting title or purpose",
+  "attendees": "Names or team",
+  "output_path": "./memory/meetings/{{meeting_topic_slug}}-prep-{{date}}.md"
 }

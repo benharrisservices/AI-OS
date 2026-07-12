@@ -1,5 +1,4 @@
 {
-  "topics": ["recent decisions", "project notes", "research findings"],
-  "period_days": 7,
+  "topic": "recent knowledge and decisions from the past week",
   "output_path": "./memory/digests/knowledge-{{date}}.md"
 }
