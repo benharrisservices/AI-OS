@@ -82,6 +82,29 @@ class MaintenanceService:
 
         return destination
 
+    def verify_backup(self, backup_path: Path | None = None) -> tuple[bool, str]:
+        """Verify a backup archive is readable and contains expected structure."""
+        if backup_path is None:
+            backups = sorted(self.settings.knowledge_backup_dir.glob("knowledge-backup-*.tar.gz"))
+            if not backups:
+                return False, "No backups found"
+            backup_path = backups[-1]
+        backup_path = backup_path.expanduser().resolve()
+        if not backup_path.exists():
+            return False, f"Backup not found: {backup_path}"
+        try:
+            with tarfile.open(backup_path, "r:gz") as archive:
+                names = archive.getnames()
+                if not names:
+                    return False, "Backup archive is empty"
+                required = ("knowledge/raw", "knowledge/processed", "knowledge/index")
+                missing = [r for r in required if not any(n.startswith(r) for n in names)]
+                if missing:
+                    return False, f"Backup missing: {', '.join(missing)}"
+                return True, f"Backup verified: {backup_path.name} ({len(names)} entries)"
+        except tarfile.TarError as exc:
+            return False, f"Invalid backup archive: {exc}"
+
     def run_all(self) -> dict[str, object]:
         """Run the full maintenance cycle: ingest, doctor, cleanup, reindex if needed."""
         results: dict[str, object] = {}

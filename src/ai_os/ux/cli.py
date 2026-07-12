@@ -144,3 +144,18 @@ def register_ux_commands(app: typer.Typer) -> None:
             f"Promotion candidates: {len(promotions)}",
             title="Memory Intelligence",
         ))
+
+    @app.command("benchmark")
+    def benchmark_cmd() -> None:
+        """Run performance benchmarks for startup diagnostics."""
+        from ai_os.system_check import run_benchmarks
+
+        results = run_benchmarks()
+        table = Table(title="AI-OS Benchmarks")
+        table.add_column("Operation")
+        table.add_column("Status")
+        table.add_column("Latency", justify="right")
+        for result in results:
+            color = "green" if result.status == "ok" else "red"
+            table.add_row(result.name, f"[{color}]{result.status}[/{color}]", result.detail)
+        console.print(table)

@@ -223,12 +223,13 @@ def status() -> None:
 def doctor(
     repair: bool = typer.Option(False, "--repair", help="Automatically repair fixable issues"),
     full: bool = typer.Option(False, "--full", help="Run full system validation across all layers"),
+    benchmark: bool = typer.Option(False, "--benchmark", help="Include performance benchmarks (with --full)"),
 ) -> None:
     """Validate index integrity and optionally repair. Use --full for system-wide checks."""
     if full:
         from ai_os.system_check import run_full_check
 
-        report = run_full_check()
+        report = run_full_check(include_benchmarks=benchmark)
         table = Table(title="AI-OS System Validation")
         table.add_column("Check")
         table.add_column("Status")

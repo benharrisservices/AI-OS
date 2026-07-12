@@ -1,7 +1,8 @@
 workflow_id: daily-review
 name: Daily Review
 description: >
-  Retrieve knowledge, make a decision, record the result, and write a notification.
+  End-of-day review with knowledge retrieval and decision recording.
+  Example: ai-os workflow run daily-review -f config/workflows/examples/daily-review.json
 version: "1.0.0"
 agent_id: agt_reviewer
 steps:

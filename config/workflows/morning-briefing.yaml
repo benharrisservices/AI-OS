@@ -1,6 +1,8 @@
 workflow_id: morning-briefing
 name: Morning Briefing
-description: Daily morning briefing with knowledge digest and priorities.
+description: >
+  Daily morning briefing with knowledge digest and priorities.
+  Example: ai-os workflow run morning-briefing -f config/workflows/examples/morning-briefing.json
 version: "1.0.0"
 agent_id: agt_reviewer
 steps:

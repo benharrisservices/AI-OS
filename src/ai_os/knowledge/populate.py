@@ -14,6 +14,7 @@ from typing import Callable
 import httpx
 
 from ai_os.knowledge.config import KnowledgeSettings
+from ai_os.knowledge.ids import fingerprint_bytes
 from ai_os.knowledge.models import SourceStatus
 from ai_os.knowledge.pipeline import KnowledgePipeline
 
@@ -223,6 +224,7 @@ class KnowledgeImporter:
 
         dest_dir = self.settings.knowledge_raw_dir / "imports" / "chats"
         dest_dir.mkdir(parents=True, exist_ok=True)
+        source_tag = fingerprint_bytes(path.read_bytes())[:12]
 
         if path.suffix.lower() == ".json":
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -239,10 +241,10 @@ class KnowledgeImporter:
                     lines.append(f"\n## {role}\n\n{content}\n")
                 else:
                     lines.append(f"\n## message {i}\n\n{msg}\n")
-            dest = dest_dir / f"{path.stem}.md"
+            dest = dest_dir / f"{path.stem}-{source_tag}.md"
             dest.write_text("\n".join(lines), encoding="utf-8")
         else:
-            dest = dest_dir / f"{path.stem}.md"
+            dest = dest_dir / f"{path.stem}-{source_tag}.md"
             dest.write_text(f"# Chat export\n\n{path.read_text(encoding='utf-8')}", encoding="utf-8")
 
         return self._import_file(dest, tags=tags or ["chat-import"], progress=progress, on_progress=on_progress)

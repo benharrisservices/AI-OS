@@ -9,7 +9,7 @@ Executable daily workflows for AI-OS. Each workflow accepts JSON input and runs 
 ai-os workflow list
 
 # Run with example input
-ai-os workflow run morning-briefing --input config/workflows/examples/morning-briefing.json
+ai-os workflow run morning-briefing --input-file config/workflows/examples/morning-briefing.json
 
 # Run with inline JSON
 ai-os workflow run daily-review --input '{"focus_areas": ["work"], "period": "today"}'

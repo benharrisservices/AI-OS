@@ -42,7 +42,35 @@ class SystemReport:
             self.healthy = False
 
 
-def run_full_check() -> SystemReport:
+def run_benchmarks() -> list[CheckResult]:
+    """Run lightweight performance benchmarks for startup diagnostics."""
+    results: list[CheckResult] = []
+
+    def bench(name: str, fn) -> None:
+        start = time.perf_counter()
+        try:
+            fn()
+            ms = int((time.perf_counter() - start) * 1000)
+            results.append(CheckResult(name=name, status="ok", detail=f"{ms}ms", duration_ms=ms))
+        except Exception as exc:
+            ms = int((time.perf_counter() - start) * 1000)
+            results.append(CheckResult(name=name, status="fail", detail=str(exc), duration_ms=ms))
+
+    from ai_os.knowledge.config import KnowledgeSettings
+    from ai_os.knowledge.search import HybridSearch
+    from ai_os.knowledge.models import SearchQuery
+
+    settings = KnowledgeSettings()
+    bench("workflow_load", lambda: WorkflowLoader(AgentSettings()).list_workflows())
+    bench("skill_discovery", lambda: discover_skills())
+    bench("provider_health", lambda: health_check_all())
+    bench("memory_list", lambda: MemoryManager(MemorySettings()).list_all(status=None))
+    bench("knowledge_search", lambda: HybridSearch(settings).search(SearchQuery(query="test", top_k=3)))
+    bench("model_route", lambda: ModelRouter().route(ModelRequest(task="benchmark")))
+    return results
+
+
+def run_full_check(*, include_benchmarks: bool = False) -> SystemReport:
     report = SystemReport()
 
     def timed(name: str, fn) -> None:
@@ -66,6 +94,23 @@ def run_full_check() -> SystemReport:
     timed("integrations", _check_integrations)
     timed("model_router", _check_router)
     timed("configuration", _check_config_paths)
+
+    from ai_os.knowledge.maintenance import MaintenanceService
+
+    def _check_backup() -> str:
+        ok, msg = MaintenanceService(KnowledgeSettings()).verify_backup()
+        if not ok and "No backups found" in msg:
+            return "no backups yet (run: ai-os backup)"
+        if not ok:
+            raise RuntimeError(msg)
+        return msg
+
+    timed("backup_verification", _check_backup)
+
+    if include_benchmarks:
+        for bench in run_benchmarks():
+            report.add(bench)
+
     return report
 
 

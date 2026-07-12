@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -62,10 +63,17 @@ def register_agent_commands(app: typer.Typer) -> None:
     def workflow_run(
         workflow_id: str = typer.Argument(..., help="Workflow ID to execute"),
         input_json: str | None = typer.Option(None, "--input", "-i", help="JSON input parameters"),
+        input_file: Path | None = typer.Option(None, "--input-file", "-f", help="Path to JSON input file"),
     ) -> None:
         """Run a workflow by ID."""
         settings = get_agent_settings()
-        input_data = json.loads(input_json) if input_json else {}
+        if input_file and input_json:
+            console.print("[red]Use either --input or --input-file, not both[/red]")
+            raise typer.Exit(1)
+        if input_file:
+            input_data = json.loads(input_file.read_text(encoding="utf-8"))
+        else:
+            input_data = json.loads(input_json) if input_json else {}
         engine = ExecutionEngine(settings)
         result = engine.run_workflow(workflow_id, input_data)
 
