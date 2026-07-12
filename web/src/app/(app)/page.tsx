@@ -58,7 +58,7 @@ export default function DashboardPage() {
   if (error || !data) {
     return (
       <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6">
-        <p className="font-medium text-destructive">Cannot reach AI-OS API</p>
+        <p className="font-medium text-destructive">Cannot reach Sedr API</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Start the API: <code className="text-xs">uv run ai-os-api</code>
         </p>

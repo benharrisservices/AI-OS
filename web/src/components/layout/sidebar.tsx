@@ -43,8 +43,8 @@ export function Sidebar() {
           <Sparkles className="h-4 w-4 text-primary" aria-hidden />
         </div>
         <div>
-          <p className="text-sm font-semibold tracking-tight">AI-OS</p>
-          <p className="text-[10px] text-muted-foreground">Personal OS</p>
+          <p className="text-sm font-semibold tracking-tight">Sedr</p>
+          <p className="text-[10px] text-muted-foreground">Personal Intelligence Platform</p>
         </div>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label="Main">

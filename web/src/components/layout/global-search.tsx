@@ -75,7 +75,7 @@ export function GlobalSearch() {
           ⌘K
         </kbd>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen} title="Search AI-OS">
+      <CommandDialog open={open} onOpenChange={setOpen} title="Search Sedr">
         <CommandInput
           placeholder="Knowledge, memory, decisions, workflows…"
           value={query}

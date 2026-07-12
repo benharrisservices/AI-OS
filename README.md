@@ -1,6 +1,6 @@
-# AI-OS
+# Sedr
 
-A personal AI Operating System — a long-term foundation for orchestrating knowledge, memory, decisions, and experiments into a coherent, production-quality platform.
+Sedr is a Personal Intelligence Platform — a long-term foundation for orchestrating knowledge, memory, decisions, and experiments into a coherent, production-quality platform.
 
 ## What is AI-OS?
 

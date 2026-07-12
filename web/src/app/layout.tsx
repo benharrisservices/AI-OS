@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI-OS",
-  description: "Personal AI Operating System",
+  title: "Sedr",
+  description: "Personal Intelligence Platform",
 };
 
 export default function RootLayout({

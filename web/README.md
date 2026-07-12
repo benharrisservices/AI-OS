@@ -1,6 +1,6 @@
-# AI-OS Web Dashboard
+# Sedr Web Dashboard
 
-Thin Next.js client for the AI-OS platform. All business logic stays in the Python backend.
+Thin Next.js client for the Sedr Personal Intelligence Platform. All business logic stays in the Python backend.
 
 ## Prerequisites
 
