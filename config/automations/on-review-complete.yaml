@@ -1,0 +1,18 @@
+automation_id: on-review-complete
+name: Post Review Logger
+description: Run when daily-review workflow completes
+workflow_id: daily-review
+input:
+  topic: "Follow-up review"
+  strategy: operational
+  output_path: "./memory/agent/followup.txt"
+  notify_path: "./memory/agent/followup-notify.txt"
+trigger:
+  trigger_type: workflow_completion
+  source_workflow_id: daily-review
+policy:
+  max_retries: 1
+  concurrency_limit: 1
+  timeout_seconds: 300
+  backoff_seconds: 15
+status: disabled

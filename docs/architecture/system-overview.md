@@ -17,9 +17,11 @@ Most AI tooling today is fragmented: chats in one place, notes in another, scrip
 ## Implemented Architecture (v0.3.x)
 
 ```
-Knowledge Engine  →  Decision Engine  →  Agent Runtime  →  Automation (future)
-                            ↑                    ↑
-                         Memory System    (via MemoryManager façade)
+Knowledge Engine  →  Decision Engine  →  Agent Runtime  →  Automation
+                            ↑                    ↑              │
+                         Memory System    (via MemoryManager) │
+                                                              │
+                                         schedules & triggers ┘
 ```
 
 | Layer | Package | Status |
@@ -28,7 +30,7 @@ Knowledge Engine  →  Decision Engine  →  Agent Runtime  →  Automation (fut
 | Decision | `src/ai_os/decision/` | Complete (v0.2.0) |
 | Agent Runtime | `src/ai_os/agent/` | Complete (v0.3.0) |
 | Memory | `src/ai_os/memory/` | Complete (v0.3.0) |
-| Automation | — | Planned (Phase 4) |
+| Automation | `src/ai_os/automation/` | Complete (v0.4.0) |
 
 See [layer-boundaries.md](layer-boundaries.md) for dependency rules and [memory-system.md](memory-system.md) for memory tier design.
 
@@ -103,7 +105,13 @@ The agent layer answers: **How do we execute?**
 
 Orchestrates tools (Knowledge, Decision, filesystem, HTTP, datetime) via YAML workflows. Injects `MemoryBundle` at task creation. Never retrieves facts or reasons directly.
 
-**Future: Automation Layer** answers: **When should execution happen?**
+### Automation Layer (`src/ai_os/automation/`)
+
+The automation layer answers: **When should execution happen?**
+
+Schedules and triggers workflow execution via `AutomationService`. Delegates all execution to Agent Runtime. Supports cron, recurring, delayed, and one-time schedules plus filesystem, webhook, startup, and workflow-completion triggers.
+
+**CLI:** `ai-os automation list|run|enable|disable|history|schedule`
 
 ### Experiments (`experiments/`)
 

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import time
 
+from typing import Any, Protocol
+
 from ai_os.agent.config import AgentSettings
 from ai_os.agent.ids import new_invocation_id, new_task_id
 from ai_os.agent.models import (
@@ -24,6 +26,12 @@ from ai_os.memory.manager import MemoryManager
 from ai_os.memory.models import EpisodicEventType, PromotionPolicy
 
 
+class WorkflowCompletionNotifier(Protocol):
+    def on_workflow_completed(
+        self, workflow_id: str, task_id: str, *, success: bool
+    ) -> Any: ...
+
+
 class ExecutionEngine:
     """Creates tasks, runs sequential workflows, handles retries and failures.
 
@@ -35,6 +43,7 @@ class ExecutionEngine:
         self,
         settings: AgentSettings | None = None,
         memory_manager: MemoryManager | None = None,
+        automation_service: WorkflowCompletionNotifier | None = None,
     ) -> None:
         self.settings = settings or AgentSettings()
         self.settings.ensure_dirs()
@@ -43,6 +52,7 @@ class ExecutionEngine:
         self.workflow_loader = WorkflowLoader(self.settings)
         self.agent_loader = AgentLoader(self.settings)
         self.memory = memory_manager or MemoryManager()
+        self.automation = automation_service
 
     def create_task(
         self,
@@ -321,3 +331,10 @@ class ExecutionEngine:
             title=title,
             summary=summary,
         )
+
+        if self.automation is not None:
+            self.automation.on_workflow_completed(
+                workflow.workflow_id,
+                task.task_id,
+                success=success,
+            )

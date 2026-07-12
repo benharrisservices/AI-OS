@@ -10,22 +10,26 @@ This document defines the **approved dependency direction** between AI-OS layers
 | Memory | What happened before? | `ai_os.memory` |
 | Decision | What should we do? | `ai_os.decision` |
 | Agent Runtime | How do we execute? | `ai_os.agent` |
-| Automation *(future)* | When should execution happen? | `ai_os.automation` |
+| Automation | When should execution happen? | `ai_os.automation` |
 
 Knowledge stores **facts**. Memory stores **experience**. These must never be merged.
 
 ## Approved Dependency Graph
 
 ```
-                    ┌─────────────┐
-                    │   agent     │
-                    └──────┬──────┘
+                    ┌──────────────┐
+                    │  automation  │
+                    └──────┬───────┘
+                           │
+                    ┌──────▼───────┐
+                    │    agent     │
+                    └──────┬───────┘
            ┌───────────────┼───────────────┐
            │               │               │
            ▼               ▼               ▼
-    ┌────────────┐  ┌────────────┐  ┌────────────┐
-    │  decision  │  │   memory   │  │ (automation)│
-    └─────┬──────┘  └────────────┘  └────────────┘
+    ┌────────────┐  ┌────────────┐
+    │  decision  │  │   memory   │
+    └─────┬──────┘  └────────────┘
           │
           ▼
     ┌────────────┐
@@ -41,12 +45,14 @@ Knowledge stores **facts**. Memory stores **experience**. These must never be me
 | `decision` | `knowledge` (retrieval contracts) |
 | `memory` | Standard library, third-party libs only |
 | `agent` | `knowledge`, `decision`, `memory` **public APIs only** |
+| `automation` | `agent` (`ExecutionEngine`) **public API only** |
 
 **Forbidden:**
 
-- `knowledge` → `decision`, `memory`, or `agent`
-- `memory` → `knowledge`, `decision`, or `agent`
-- `decision` → `memory` or `agent`
+- `knowledge` → `decision`, `memory`, `agent`, or `automation`
+- `memory` → `knowledge`, `decision`, `agent`, or `automation`
+- `decision` → `memory`, `agent`, or `automation`
+- `agent` → `automation` (notification uses Protocol, not import)
 - Any circular import between layers
 - Any consumer reaching into another layer's internal modules (`store.py`, `retrieval.py`, etc.)
 
@@ -124,6 +130,25 @@ Agent Runtime reaches Knowledge and Decision through **registered tools** (`know
 
 Memory is injected at task creation via `MemoryManager.retrieve_for_task()` and written back through `create_episodic`, `sync_working`, and `promote_working_for_task`.
 
+## AutomationService Façade
+
+Automation interacts with execution **only** through `ExecutionEngine.run_workflow()`. Agent Runtime notifies automation of workflow completion via the `WorkflowCompletionNotifier` protocol — avoiding circular imports between `agent` and `automation` packages.
+
+### Public API
+
+| Method | Purpose |
+|--------|---------|
+| `list_automations` | List all automation definitions |
+| `run` | Execute immediately |
+| `enable` / `disable` / `pause` | Policy state |
+| `schedule` | Configure cron, recurring, delayed, or one-time |
+| `tick` | Process due scheduled automations |
+| `history` | Execution history |
+| `on_startup` | Fire startup triggers |
+| `on_workflow_completed` | Fire workflow-completion triggers |
+| `on_filesystem_event` | Fire filesystem triggers |
+| `trigger_webhook` | Validate token and run |
+
 ## Extension Rules
 
 1. **New memory backends** — Implement behind `MemoryStore`; expose only via `MemoryManager`.
@@ -131,6 +156,7 @@ Memory is injected at task creation via `MemoryManager.retrieve_for_task()` and 
 3. **New decision strategies** — Register in `decision/strategies/`; consume Knowledge via `KnowledgeRetrieval` only.
 4. **New knowledge extractors** — Register in `knowledge/extractors/`; no upstream dependencies.
 5. **Cross-layer data** — Pass contracts (`ContextBundle`, `MemoryBundle`, `DecisionResult`), not internal store records.
+6. **New automations** — YAML in `config/automations/`; execution only via `AutomationService` → `ExecutionEngine`.
 
 ## Verification
 
@@ -141,7 +167,7 @@ python3 -c "
 import ast
 from pathlib import Path
 
-layers = ['knowledge', 'decision', 'memory', 'agent']
+layers = ['knowledge', 'decision', 'memory', 'agent', 'automation']
 ROOT = Path('src/ai_os')
 for layer in layers:
     deps = set()

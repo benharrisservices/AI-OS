@@ -1,0 +1,21 @@
+automation_id: morning-review
+name: Morning Review
+description: Run daily review workflow every morning at 9am UTC
+workflow_id: daily-review
+input:
+  topic: "Morning review"
+  strategy: analytical
+  output_path: "./memory/agent/review.txt"
+  notify_path: "./memory/agent/notify.txt"
+schedule:
+  schedule_type: cron
+  cron_expression: "0 9 * * *"
+trigger:
+  trigger_type: schedule
+policy:
+  max_retries: 2
+  concurrency_limit: 1
+  timeout_seconds: 600
+  backoff_seconds: 30
+  pause_on_failure: false
+status: enabled
