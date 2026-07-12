@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Brain,
   Home,
   Layers,
   Plug,
@@ -43,7 +42,7 @@ const SCREENS = [
     body: "Knowledge, Memory, Decisions, Agents, Workflows, Automations, Imports, Providers, Models, and Settings — all in one place.",
   },
   {
-    icon: Brain,
+    icon: SeedIcon,
     title: "You're ready.",
     body: "Launch the dashboard and explore your personal intelligence platform.",
     isFinal: true,
