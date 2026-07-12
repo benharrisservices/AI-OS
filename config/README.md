@@ -29,4 +29,14 @@ Central place for **committed** configuration structure — not runtime secrets.
 
 ## Current state
 
-Foundation phase — add schema files as each roadmap phase defines contracts.
+Production configuration lives in:
+
+| Path | Role |
+|------|------|
+| `config/personal/` | Personal workflow templates and provider `.env` example |
+| `config/workflows/` | Workflow definitions (YAML) |
+| `config/automations/` | Scheduled automations |
+| `config/agents/` | Agent definitions |
+| `docs/personal/` | Setup guides and import plan |
+
+See [docs/personal/README.md](../docs/personal/README.md) for provider setup and daily workflow configuration.

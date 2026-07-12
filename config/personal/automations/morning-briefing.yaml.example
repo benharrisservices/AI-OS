@@ -1,0 +1,20 @@
+# Example personal automation — copy to config/automations/ and edit
+
+automation_id: my-morning-briefing
+name: My Morning Briefing
+description: Weekday morning briefing at 7:00 local (adjust cron for your timezone)
+workflow_id: morning-briefing
+input:
+  focus: "Today's priorities, calendar, and blockers"
+  output_path: "./memory/briefings/morning-{{date}}.md"
+schedule:
+  schedule_type: cron
+  cron_expression: "0 7 * * 1-5"
+trigger:
+  trigger_type: schedule
+policy:
+  max_retries: 2
+  concurrency_limit: 1
+  timeout_seconds: 600
+  backoff_seconds: 30
+status: disabled

@@ -1,0 +1,6 @@
+{
+  "_comment": "Project status review. Use project codename or client name.",
+  "project_name": "Project name or codename",
+  "review_scope": "status, risks, next milestones, blockers",
+  "output_path": "./memory/projects/{{project_slug}}-review-{{date}}.md"
+}

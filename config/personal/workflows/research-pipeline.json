@@ -1,0 +1,6 @@
+{
+  "_comment": "Structured research with decision brief output.",
+  "topic": "Research question or decision to investigate",
+  "depth": "overview | comprehensive",
+  "output_path": "./memory/research/{{topic_slug}}-{{date}}.md"
+}

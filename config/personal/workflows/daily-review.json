@@ -1,0 +1,7 @@
+{
+  "_comment": "End-of-day review. Edit topic and paths to match your routine.",
+  "topic": "What did I accomplish today? What carries over to tomorrow? What should I deprioritize?",
+  "strategy": "analytical",
+  "output_path": "./memory/reviews/daily-{{date}}.md",
+  "notify_path": "./memory/reviews/daily-{{date}}-done.txt"
+}

@@ -1,0 +1,8 @@
+{
+  "_comment": "Travel planning workflow. Replace placeholders with your trip details.",
+  "destination": "City, Country",
+  "dates": "YYYY-MM-DD to YYYY-MM-DD",
+  "purpose": "Business | Leisure | Conference",
+  "budget_notes": "Optional budget or constraints",
+  "output_path": "./memory/travel/{{destination_slug}}-{{date}}.md"
+}

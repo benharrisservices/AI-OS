@@ -1,0 +1,5 @@
+{
+  "_comment": "Weekly retrospective and next-week planning.",
+  "week_focus": "Wins, blockers, and priorities for the coming week across work and personal goals",
+  "output_path": "./memory/reviews/weekly-{{date}}.md"
+}

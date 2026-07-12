@@ -1,0 +1,5 @@
+{
+  "_comment": "Edit placeholders before running. No personal data is hardcoded.",
+  "focus": "Today's top 3 priorities, calendar overview, and overnight updates",
+  "output_path": "./memory/briefings/morning-{{date}}.md"
+}

@@ -129,6 +129,8 @@ uv run ai-os provider health        # check provider adapters
 uv run ai-os update --check         # verify installation
 ```
 
+See [docs/OPERATING-MANUAL.md](docs/OPERATING-MANUAL.md) for a plain-language guide (no programming experience required).
+
 See [config/workflows/README.md](config/workflows/README.md) for workflow examples and [docs/production-readiness.md](docs/production-readiness.md) for operational guidance.
 
 ## License
