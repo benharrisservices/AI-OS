@@ -8,6 +8,7 @@ Technical design artifacts for AI-OS: how components connect, what each layer ow
 - [knowledge-engine.md](knowledge-engine.md) — Phase 1 Knowledge Engine design (ingestion, indexing, retrieval)
 - [memory-system.md](memory-system.md) — Phase 3.5 Memory System (four tiers, promotion, façade)
 - [automation-layer.md](automation-layer.md) — Phase 4 Automation Layer (scheduling, triggers)
+- [capability-layer.md](capability-layer.md) — Phase 5 Capability Layer (skills)
 - [layer-boundaries.md](layer-boundaries.md) — Approved dependency direction and extension rules
 
 ## What belongs here
