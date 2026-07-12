@@ -37,8 +37,8 @@ export default function WorkflowsPageInner() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Workflows</h1>
-        <p className="text-sm text-muted-foreground">Run workflows and view execution history</p>
+        <h1 className="page-title">Workflows</h1>
+        <p className="page-subtitle">Run workflows and view execution history</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

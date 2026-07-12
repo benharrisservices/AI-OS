@@ -66,12 +66,12 @@ export function GlobalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-11 w-full max-w-lg items-center gap-2.5 rounded-2xl border border-border/70 bg-muted/30 px-4 text-[0.9375rem] text-muted-foreground transition-all duration-150 ease-out hover:border-border hover:bg-muted/50"
+        className="flex h-12 w-full max-w-lg items-center gap-2.5 rounded-2xl border border-border bg-muted/50 px-4 text-[1rem] font-medium text-muted-foreground transition-all duration-150 ease-out hover:border-primary/40 hover:bg-muted/70 hover:text-foreground"
         aria-label="Open search"
       >
-        <Search className="h-[1.0625rem] w-[1.0625rem] shrink-0 opacity-70" aria-hidden />
+        <Search className="h-[1.1875rem] w-[1.1875rem] shrink-0 opacity-80" strokeWidth={2.1} aria-hidden />
         <span className="flex-1 text-left">Search everything…</span>
-        <kbd className="hidden items-center rounded-md bg-foreground/[0.06] px-1.5 py-0.5 text-[0.6875rem] font-medium text-muted-foreground/80 sm:inline-flex">
+        <kbd className="hidden items-center rounded-md border border-border/60 bg-foreground/[0.05] px-1.5 py-0.5 text-[0.75rem] font-semibold text-muted-foreground sm:inline-flex">
           ⌘K
         </kbd>
       </button>

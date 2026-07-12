@@ -38,16 +38,16 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-[15.5rem] shrink-0 flex-col border-r border-border/70 bg-sidebar">
+    <aside className="flex h-full w-[16.5rem] shrink-0 flex-col border-r border-border/70 bg-sidebar">
       <div className="flex h-[3.5rem] items-center gap-3 border-b border-border/70 px-5">
         <div className="flex h-8 w-8 items-center justify-center">
-          <SeedIcon className="h-[1.125rem] w-[1.125rem] text-primary" />
+          <SeedIcon className="h-[1.25rem] w-[1.25rem] text-primary" />
         </div>
         <div>
-          <p className="text-[0.9375rem] font-bold tracking-[-0.02em] lowercase text-foreground">
+          <p className="text-[1rem] font-bold tracking-[-0.02em] lowercase text-foreground">
             sedr
           </p>
-          <p className="text-[0.625rem] font-semibold tracking-[0.06em] text-muted-foreground/70 uppercase">
+          <p className="text-[0.6875rem] font-semibold tracking-[0.06em] text-muted-foreground uppercase">
             Intelligence
           </p>
         </div>
@@ -61,18 +61,19 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9063rem] font-medium transition-all duration-150 ease-out",
+                "flex items-center gap-3 rounded-xl px-3.5 py-3 text-[0.9688rem] font-semibold transition-all duration-150 ease-out",
                 active
                   ? "nav-selected text-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground",
+                  : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
               )}
               aria-current={active ? "page" : undefined}
             >
               <Icon
                 className={cn(
-                  "h-[0.9375rem] w-[0.9375rem] shrink-0 transition-opacity",
-                  active ? "text-primary opacity-100" : "opacity-70",
+                  "h-[1.125rem] w-[1.125rem] shrink-0 transition-opacity",
+                  active ? "text-primary opacity-100" : "opacity-80",
                 )}
+                strokeWidth={active ? 2.4 : 2.1}
                 aria-hidden
               />
               {label}
@@ -84,9 +85,9 @@ export function Sidebar() {
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9063rem] font-medium text-muted-foreground transition-colors duration-150 ease-out hover:bg-sidebar-accent/50 hover:text-foreground"
+          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-[0.9688rem] font-semibold text-muted-foreground transition-colors duration-150 ease-out hover:bg-sidebar-accent/70 hover:text-foreground"
         >
-          <LogOut className="h-[0.9375rem] w-[0.9375rem] shrink-0 opacity-70" aria-hidden />
+          <LogOut className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-80" strokeWidth={2.1} aria-hidden />
           Log out
         </button>
       </div>

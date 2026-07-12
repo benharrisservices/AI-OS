@@ -15,8 +15,8 @@ export default function AgentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Agents</h1>
-        <p className="text-sm text-muted-foreground">Registered agent definitions and tools</p>
+        <h1 className="page-title">Agents</h1>
+        <p className="page-subtitle">Registered agent definitions and tools</p>
       </div>
       {isLoading ? (
         <Skeleton className="h-40" />
