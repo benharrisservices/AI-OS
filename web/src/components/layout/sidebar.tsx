@@ -8,7 +8,6 @@ import {
   CalendarClock,
   Cpu,
   Download,
-  GitBranch,
   Home,
   Layers,
   LogOut,
@@ -39,17 +38,21 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-sidebar">
-      <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/12">
-          <SeedIcon className="h-4 w-4 text-primary" />
+    <aside className="flex h-full w-[15rem] shrink-0 flex-col border-r border-border/80 bg-sidebar">
+      <div className="flex h-[3.25rem] items-center gap-3 border-b border-border/80 px-5">
+        <div className="flex h-8 w-8 items-center justify-center">
+          <SeedIcon className="h-[1.125rem] w-[1.125rem] text-primary" />
         </div>
         <div>
-          <p className="text-sm font-semibold tracking-tight lowercase">sedr</p>
-          <p className="text-[10px] text-muted-foreground">Personal Intelligence Platform</p>
+          <p className="text-[0.9375rem] font-semibold tracking-[-0.02em] lowercase text-foreground">
+            sedr
+          </p>
+          <p className="text-[0.625rem] font-medium tracking-wide text-muted-foreground/80 uppercase">
+            Intelligence
+          </p>
         </div>
       </div>
-      <nav className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label="Main">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto p-2.5" aria-label="Main">
         {nav.map(({ href, label, icon: Icon }) => {
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -58,32 +61,28 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.875rem] transition-all duration-150",
                 active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground",
+                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                  : "font-medium text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
               )}
               aria-current={active ? "page" : undefined}
             >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden />
+              <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
               {label}
             </Link>
           );
         })}
       </nav>
-      <div className="space-y-2 border-t border-border p-3">
+      <div className="border-t border-border/80 p-3">
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-foreground"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[0.875rem] font-medium text-muted-foreground transition-colors duration-150 hover:bg-sidebar-accent/60 hover:text-foreground"
         >
-          <LogOut className="h-4 w-4 shrink-0" aria-hidden />
+          <LogOut className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
           Log out
         </button>
-        <div className="flex items-center gap-2 px-2.5 text-xs text-muted-foreground">
-          <GitBranch className="h-3 w-3" aria-hidden />
-          <span>v1.2.0</span>
-        </div>
       </div>
     </aside>
   );

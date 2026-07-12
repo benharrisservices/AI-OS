@@ -61,7 +61,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   }
 
   return (
-    <div className="brand-gradient fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-lg space-y-8 text-center">
         <div className="flex justify-center gap-2">
           {SCREENS.map((_, i) => (
@@ -78,7 +78,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           ))}
         </div>
 
-        <div className="space-y-6 rounded-3xl border border-border bg-card p-10 ring-1 ring-foreground/8">
+        <div className="space-y-8 rounded-3xl bg-card/50 p-10">
           <div className="flex justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/12">
               <Icon className="h-7 w-7 text-primary" />

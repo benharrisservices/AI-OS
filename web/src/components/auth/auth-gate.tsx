@@ -24,12 +24,12 @@ export function AuthGate({ children }: AuthGateProps) {
 
   if (!ready) {
     return (
-      <div className="brand-gradient flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/12">
-            <SeedIcon className="h-7 w-7 animate-pulse text-primary" />
-          </div>
-          <p className="text-sm text-muted-foreground lowercase">sedr</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-5">
+          <SeedIcon className="h-8 w-8 animate-pulse text-primary" />
+          <p className="text-sm font-medium tracking-wide text-muted-foreground lowercase">
+            sedr
+          </p>
         </div>
       </div>
     );

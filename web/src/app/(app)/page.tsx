@@ -74,13 +74,16 @@ export default function DashboardPage() {
   ).length;
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
+    <div className="space-y-10">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">
             System overview ·{" "}
-            <Badge variant={data.status === "healthy" ? "default" : "secondary"}>
+            <Badge
+              variant={data.status === "healthy" ? "default" : "secondary"}
+              className="font-medium"
+            >
               {data.status}
             </Badge>
           </p>
@@ -88,6 +91,7 @@ export default function DashboardPage() {
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
+            className="rounded-xl"
             onClick={() => runWorkflow.mutate("morning-briefing")}
             disabled={runWorkflow.isPending}
           >
@@ -97,6 +101,7 @@ export default function DashboardPage() {
           <Button
             size="sm"
             variant="outline"
+            className="rounded-xl"
             onClick={() => doctor.mutate()}
             disabled={doctor.isPending}
           >
@@ -110,57 +115,49 @@ export default function DashboardPage() {
         <h2 id="stats-heading" className="sr-only">
           Statistics
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Knowledge
-              </CardTitle>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="transition-colors duration-150 hover:bg-card/80">
+            <CardHeader className="pb-1">
+              <CardTitle className="metric-label">Knowledge</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold">{data.counts.documents}</p>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="space-y-1">
+              <p className="metric-value">{data.counts.documents}</p>
+              <p className="text-[0.8125rem] text-muted-foreground">
                 {data.counts.chunks} chunks · {formatBytes(data.health.storage_bytes)}
               </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Memories
-              </CardTitle>
+          <Card className="transition-colors duration-150 hover:bg-card/80">
+            <CardHeader className="pb-1">
+              <CardTitle className="metric-label">Memories</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold">{data.counts.memories}</p>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="space-y-1">
+              <p className="metric-value">{data.counts.memories}</p>
+              <p className="text-[0.8125rem] text-muted-foreground">
                 {data.counts.automations} automations
               </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Providers
-              </CardTitle>
+          <Card className="transition-colors duration-150 hover:bg-card/80">
+            <CardHeader className="pb-1">
+              <CardTitle className="metric-label">Providers</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold">
+            <CardContent className="space-y-1">
+              <p className="metric-value">
                 {healthyProviders}/{data.counts.providers}
               </p>
-              <p className="text-xs text-muted-foreground">healthy</p>
+              <p className="text-[0.8125rem] text-muted-foreground">healthy</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Model Router
-              </CardTitle>
+          <Card className="transition-colors duration-150 hover:bg-card/80">
+            <CardHeader className="pb-1">
+              <CardTitle className="metric-label">Model Router</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-lg font-semibold">
+            <CardContent className="space-y-1">
+              <p className="text-xl font-semibold tracking-[-0.02em]">
                 {data.model_route.provider_id}/{data.model_route.model_id}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[0.8125rem] text-muted-foreground">
                 score {data.model_route.score.toFixed(2)}
               </p>
             </CardContent>
@@ -171,8 +168,8 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="h-4 w-4" aria-hidden />
+            <CardTitle className="flex items-center gap-2.5 text-[0.9375rem] font-semibold">
+              <Activity className="h-4 w-4 text-primary/80" aria-hidden />
               Recent Activity
             </CardTitle>
           </CardHeader>

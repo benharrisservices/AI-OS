@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+
 export default function SettingsPage() {
   const version = useQuery({ queryKey: ["version"], queryFn: api.settings.version });
   const paths = useQuery({ queryKey: ["config-paths"], queryFn: api.settings.paths });
@@ -15,18 +17,28 @@ export default function SettingsPage() {
   const doctor = useMutation({ mutationFn: () => api.settings.doctor() });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">
             Configuration, directories, and diagnostics
           </p>
         </div>
-        <Button onClick={() => doctor.mutate()} disabled={doctor.isPending}>
+        <Button className="rounded-xl" onClick={() => doctor.mutate()} disabled={doctor.isPending}>
           Run system doctor
         </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-[0.9375rem] font-semibold">Appearance</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Theme</p>
+          <ThemeToggle showLabel />
+        </CardContent>
+      </Card>
 
       {version.data && (
         <Card>
