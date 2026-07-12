@@ -30,8 +30,8 @@ class TestHttpProviders:
             for key in list(os.environ.keys()):
                 if key.startswith("OPENAI"):
                     del os.environ[key]
-        health = provider.health_check()
-        assert health.status == ProviderStatus.NOT_CONFIGURED
+            health = provider.health_check()
+            assert health.status == ProviderStatus.NOT_CONFIGURED
 
     def test_github_invoke_repos_mock(self) -> None:
         provider = GitHubProvider()
@@ -53,6 +53,6 @@ class TestHttpProviders:
         provider = OpenAIProvider()
         with patch.dict(os.environ, {}, clear=True):
             os.environ.pop("OPENAI_API_KEY", None)
-        result = provider.invoke("chat", {})
-        assert result["success"] is False
-        assert "not configured" in result["error"]
+            result = provider.invoke("chat", {})
+            assert result["success"] is False
+            assert "not configured" in result["error"]

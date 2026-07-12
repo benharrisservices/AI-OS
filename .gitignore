@@ -216,6 +216,7 @@ models/
 *.safetensors
 *.pt
 *.pth
+!ai_os_bootstrap.pth
 *.onnx
 *.mlmodel
 *.h5
