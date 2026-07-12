@@ -1,0 +1,5 @@
+{
+  "topic": "emerging AI agent architectures",
+  "depth": "comprehensive",
+  "output_path": "./memory/research/{{topic_slug}}.md"
+}

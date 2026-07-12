@@ -1,0 +1,4 @@
+{
+  "repo": ".",
+  "output_path": "./memory/reports/repo-health-{{date}}.md"
+}

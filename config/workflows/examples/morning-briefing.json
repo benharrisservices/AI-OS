@@ -1,0 +1,4 @@
+{
+  "focus": "Review overnight emails, calendar, and project blockers",
+  "output_path": "./memory/briefings/morning-{{date}}.md"
+}

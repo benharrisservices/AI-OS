@@ -90,48 +90,46 @@ High-level phases (details in [docs/roadmap/](docs/roadmap/)):
 | **2 — Memory** | Persistent context model, retention policies, privacy boundaries | Planned |
 | **3 — Decision engine** | Prompt registry, template versioning, evaluation harness | Planned |
 | **4 — Integration** | Orchestration layer tying knowledge + memory + decisions | Planned |
-| **5 — Hardening** | Tests, observability, deployment patterns, security review | Planned |
+| **5 — Hardening** | Tests, observability, deployment patterns, security review | **Complete** |
+| **6 — Production** | Provider integrations, workflows, import tools, `doctor --full` | **Current** |
 
 ## Getting Started
 
 ### Prerequisites
 
 - Git
-- A Unix-like shell (macOS or Linux recommended)
-- Python 3.11+ and/or Node.js 20+ (when application code is added)
+- Python 3.12+
+- [uv](https://github.com/astral-sh/uv) (recommended)
 - API keys for your chosen LLM providers (stored locally, never committed)
 
-### Setup
+### Install
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/your-org/AI-OS.git
+cd AI-OS
+./scripts/install.sh
+```
 
-   ```bash
-   git clone https://github.com/your-org/AI-OS.git
-   cd AI-OS
-   ```
+Or manually:
 
-2. **Configure environment**
+```bash
+uv sync
+cp .env.example .env   # add your API keys
+uv run ai-os doctor --full
+```
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your local values — never commit .env
-   ```
+### Daily commands
 
-3. **Read the docs**
+```bash
+uv run ai-os dashboard              # system overview
+uv run ai-os doctor --full          # validate entire installation
+uv run ai-os workflow run morning-briefing --input config/workflows/examples/morning-briefing.json
+uv run ai-os import ./docs --type folder --tag docs
+uv run ai-os provider health        # check provider adapters
+uv run ai-os update --check         # verify installation
+```
 
-   - [System overview](docs/architecture/system-overview.md)
-   - [Contributing](CONTRIBUTING.md)
-   - Directory READMEs under each top-level folder
-
-4. **Explore safely**
-
-   - Put experiments under `experiments/`
-   - Put raw inputs under `knowledge/raw/`
-   - Record significant choices in `docs/decisions/`
-
-### What is intentionally not here yet
-
-This repository is in **foundation phase**. There is no application runtime, package manifest, or installed dependencies. That keeps the architecture honest before code accretes.
+See [config/workflows/README.md](config/workflows/README.md) for workflow examples and [docs/production-readiness.md](docs/production-readiness.md) for operational guidance.
 
 ## License
 

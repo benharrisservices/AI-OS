@@ -1,0 +1,6 @@
+{
+  "destination": "San Francisco",
+  "dates": "2026-08-01 to 2026-08-05",
+  "purpose": "Conference and client meetings",
+  "output_path": "./memory/travel/{{destination_slug}}.md"
+}

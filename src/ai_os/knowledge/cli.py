@@ -19,7 +19,7 @@ from ai_os.knowledge.retrieval import KnowledgeRetrieval, format_context_prompt
 from ai_os.knowledge.search import HybridSearch
 from ai_os.knowledge.watcher import InboxWatcher
 
-app = typer.Typer(help="AI-OS Knowledge Engine", no_args_is_help=True)
+app = typer.Typer(help="AI-OS — personal AI operating system", no_args_is_help=True)
 maintenance_app = typer.Typer(help="Scheduled maintenance tasks", no_args_is_help=True)
 app.add_typer(maintenance_app, name="maintenance")
 
@@ -222,8 +222,29 @@ def status() -> None:
 @app.command("doctor")
 def doctor(
     repair: bool = typer.Option(False, "--repair", help="Automatically repair fixable issues"),
+    full: bool = typer.Option(False, "--full", help="Run full system validation across all layers"),
 ) -> None:
-    """Validate index integrity and optionally repair."""
+    """Validate index integrity and optionally repair. Use --full for system-wide checks."""
+    if full:
+        from ai_os.system_check import run_full_check
+
+        report = run_full_check()
+        table = Table(title="AI-OS System Validation")
+        table.add_column("Check")
+        table.add_column("Status")
+        table.add_column("Detail")
+        table.add_column("ms", justify="right")
+        for result in report.results:
+            color = {"ok": "green", "warn": "yellow", "fail": "red"}.get(result.status, "white")
+            table.add_row(result.name, f"[{color}]{result.status}[/{color}]", result.detail[:80], str(result.duration_ms))
+        console.print(table)
+        if report.healthy:
+            console.print("\n[green]System validation passed[/green]")
+        else:
+            console.print("\n[red]System validation found failures[/red]")
+            raise typer.Exit(code=1)
+        return
+
     service = MaintenanceService(get_settings())
     issues, actions = service.doctor(repair=repair)
 
@@ -246,6 +267,76 @@ def doctor(
             console.print(f"  • {action}")
     elif not repair:
         console.print("\n[dim]Run with --repair to fix repairable issues automatically[/dim]")
+
+
+@app.command("import")
+def import_cmd(
+    source: str = typer.Argument(..., help="Path, GitHub owner/repo, or git URL"),
+    source_type: str = typer.Option(
+        "auto",
+        "--type",
+        "-t",
+        help="Source type: auto, folder, markdown, text, pdf, docx, git, github, chats",
+    ),
+    tag: list[str] = typer.Option([], "--tag", help="Tags to attach"),
+    clone: bool = typer.Option(False, "--clone", help="Clone remote git URL before import"),
+) -> None:
+    """Import content from files, folders, git repos, GitHub, or chat exports."""
+    from ai_os.knowledge.populate import KnowledgeImporter
+
+    importer = KnowledgeImporter(get_settings())
+
+    def on_progress(msg: str) -> None:
+        console.print(f"  {msg}")
+
+    if clone or source.startswith("http") or source.startswith("git@"):
+        progress = importer.clone_and_import(source, tags=tag or None, on_progress=on_progress)
+    else:
+        progress = importer.import_path(source, source_type=source_type, tags=tag or None, on_progress=on_progress)
+
+    summary = progress.report()
+    console.print(f"\n[bold]Import complete[/bold]: {summary}")
+    if progress.errors:
+        console.print("[yellow]Errors:[/yellow]")
+        for err in progress.errors[:10]:
+            console.print(f"  • {err}")
+    if progress.failed:
+        raise typer.Exit(code=1)
+
+
+@app.command("update")
+def update_cmd(
+    check_only: bool = typer.Option(False, "--check", help="Verify installation without updating"),
+) -> None:
+    """Verify or refresh the AI-OS installation and dependencies."""
+    import subprocess
+    import sys
+
+    console.print("[bold]Verifying AI-OS installation...[/bold]")
+    from ai_os.system_check import run_full_check
+
+    report = run_full_check()
+    failed = [r for r in report.results if r.status == "fail"]
+    if failed:
+        for r in failed:
+            console.print(f"  [red]✗[/red] {r.name}: {r.detail}")
+    else:
+        console.print("  [green]✓[/green] All system checks passed")
+
+    if check_only:
+        raise typer.Exit(code=1 if failed else 0)
+
+    console.print("\n[bold]Syncing dependencies...[/bold]")
+    result = subprocess.run(
+        ["uv", "sync"],
+        cwd=Path(__file__).resolve().parents[3],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        console.print(f"[red]uv sync failed:[/red] {result.stderr or result.stdout}")
+        raise typer.Exit(code=1)
+    console.print(f"  [green]✓[/green] Dependencies synced (Python {sys.version_info.major}.{sys.version_info.minor})")
 
 
 @app.command("watch")
