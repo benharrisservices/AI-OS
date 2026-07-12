@@ -25,7 +25,11 @@ class ModelRouter:
                 metadata={"override": True},
             )
 
-        candidates = self._filter_candidates(request)
+        priorities = list(request.priorities)
+        if not priorities and self.settings.prefer_local:
+            priorities = [RoutingPriority.LOCAL]
+
+        candidates = self._filter_candidates(request, priorities=priorities)
         if not candidates:
             provider = self.settings.default_provider
             return ModelRoute(
@@ -37,7 +41,7 @@ class ModelRouter:
             )
 
         scored = sorted(
-            ((p, self._score(p, request)) for p in candidates),
+            ((p, self._score(p, request, priorities=priorities)) for p in candidates),
             key=lambda x: x[1],
             reverse=True,
         )
@@ -53,25 +57,38 @@ class ModelRouter:
             metadata={"task": request.task},
         )
 
-    def _filter_candidates(self, request: ModelRequest) -> list[ModelProfile]:
+    def _filter_candidates(
+        self, request: ModelRequest, *, priorities: list[RoutingPriority] | None = None
+    ) -> list[ModelProfile]:
+        healthy = self._healthy_providers()
+        priorities = priorities if priorities is not None else request.priorities
         result = []
         for p in self._profiles:
+            if p.provider_id not in healthy:
+                continue
             if request.min_context_length and p.context_length < request.min_context_length:
                 continue
             if request.require_structured_output and not p.supports_structured_output:
                 continue
             if request.require_multimodal and not p.supports_multimodal:
                 continue
-            if RoutingPriority.LOCAL in request.priorities and not p.is_local:
+            if RoutingPriority.LOCAL in priorities and not p.is_local:
                 continue
             result.append(p)
-        return result or list(self._profiles)
+        return result or [p for p in self._profiles if p.provider_id in healthy]
 
-    def _score(self, profile: ModelProfile, request: ModelRequest) -> float:
-        if not request.priorities:
+    def _score(
+        self,
+        profile: ModelProfile,
+        request: ModelRequest,
+        *,
+        priorities: list[RoutingPriority] | None = None,
+    ) -> float:
+        priorities = priorities if priorities is not None else request.priorities
+        if not priorities:
             return (profile.reasoning_score + profile.coding_score) / 2
         scores: list[float] = []
-        for priority in request.priorities:
+        for priority in priorities:
             if priority == RoutingPriority.LATENCY:
                 scores.append(profile.latency_score)
             elif priority == RoutingPriority.COST:
@@ -89,11 +106,14 @@ class ModelRouter:
     def _fallback_chain(self) -> list[str]:
         return [p.strip() for p in self.settings.fallback_chain.split(",") if p.strip()]
 
-    def _available_providers(self) -> set[str]:
+    def _healthy_providers(self) -> set[str]:
         discover_providers()
-        available: set[str] = set()
+        healthy: set[str] = set()
         for pid in self._fallback_chain():
             provider = get_provider(pid)
-            if provider and provider.health_check().status.value in ("healthy", "not_configured"):
-                available.add(pid)
-        return available
+            if provider and provider.health_check().status.value == "healthy":
+                healthy.add(pid)
+        return healthy
+
+    def _available_providers(self) -> set[str]:
+        return self._healthy_providers()
