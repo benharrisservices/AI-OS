@@ -44,4 +44,7 @@ def discover_tools(settings: AgentSettings | None = None) -> list[str]:
     from ai_os.agent.tools.builtin import register_builtin_tools
 
     register_builtin_tools(settings or AgentSettings())
+    from ai_os.capabilities.registry import register_skills_as_tools
+
+    register_skills_as_tools()
     return list(_REGISTRY.keys())

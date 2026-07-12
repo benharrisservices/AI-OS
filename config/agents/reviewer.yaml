@@ -1,13 +1,31 @@
 agent_id: agt_reviewer
 name: Reviewer
-description: Retrieves knowledge and produces structured decisions.
+description: Retrieves knowledge, runs skills, and produces structured decisions.
 tools:
   - knowledge_retrieve
   - decision_make
   - filesystem_write
+  - filesystem_read
   - datetime_now
+  - skill_deep_research
+  - skill_company_research
+  - skill_product_research
+  - skill_web_research
+  - skill_document_summarisation
+  - skill_specification_generation
+  - skill_email_drafting
+  - skill_meeting_preparation
+  - skill_task_planning
+  - skill_github_repository_analysis
+  - skill_code_review
+  - skill_travel_planning
+  - skill_flight_research
+  - skill_hotel_research
+  - skill_financial_comparison
+  - skill_decision_brief_generation
 permissions:
   - knowledge:read
   - decision:execute
   - filesystem:write
+  - filesystem:read
   - system:read
