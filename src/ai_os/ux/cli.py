@@ -13,7 +13,7 @@ from rich.table import Table
 from ai_os.automation.config import get_automation_settings
 from ai_os.automation.service import AutomationService
 from ai_os.capabilities.registry import discover_skills, list_skills
-from ai_os.integrations.registry import health_check_all
+from ai_os.integrations.registry import discover_providers, health_check_all, list_providers
 from ai_os.memory.intelligence import MemoryIntelligence
 from ai_os.memory.manager import MemoryManager
 from ai_os.routing.router import ModelRouter
@@ -30,15 +30,16 @@ def register_ux_commands(app: typer.Typer) -> None:
         skills = list_skills()
         automations = AutomationService(get_automation_settings()).list_automations()
         memories = MemoryManager().list_all(status=None)
-        providers = health_check_all()
-        healthy = sum(1 for p in providers if p.status.value == "healthy")
+        discover_providers()
+        provider_count = len(list_providers())
 
         console.print(Panel.fit(
             f"Skills: {len(skills)} · Automations: {len(automations)}\n"
-            f"Memories: {len(memories)} · Providers healthy: {healthy}/{len(providers)}",
+            f"Memories: {len(memories)} · Providers registered: {provider_count}",
             title="AI-OS Dashboard",
             border_style="blue",
         ))
+        console.print("[dim]Run: uv run ai-os provider health  for live provider status[/dim]")
 
     @app.command("timeline")
     def timeline(
@@ -63,8 +64,8 @@ def register_ux_commands(app: typer.Typer) -> None:
         except Exception as exc:
             checks.append(("Skills", "fail", str(exc)))
         try:
-            health_check_all()
-            checks.append(("Providers", "ok", "registered"))
+            discover_providers()
+            checks.append(("Providers", "ok", f"{len(list_providers())} registered"))
         except Exception as exc:
             checks.append(("Providers", "fail", str(exc)))
         try:

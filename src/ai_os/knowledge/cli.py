@@ -172,12 +172,12 @@ def retrieve(
 
 @app.command("status")
 def status() -> None:
-    """Show complete system health report."""
-    report = HealthService(get_settings()).report()
+    """Show system health report (lightweight — use doctor for full integrity checks)."""
+    report = HealthService(get_settings()).report(run_integrity=False)
 
     color = "green" if report.healthy else "yellow"
     console.print(Panel.fit(
-        f"[bold]AI-OS Knowledge Engine[/bold]\n"
+        f"[bold]AI-OS[/bold]\n"
         f"Status: [{color}]{'healthy' if report.healthy else 'needs attention'}[/]",
         border_style=color,
     ))
@@ -304,6 +304,11 @@ def import_cmd(
     if progress.failed:
         raise typer.Exit(code=1)
 
+    from ai_os.knowledge.maintenance import MaintenanceService
+
+    if MaintenanceService(get_settings()).ensure_search_indexes():
+        console.print("[green]Search indexes rebuilt[/green]")
+
 
 @app.command("update")
 def update_cmd(
@@ -422,7 +427,7 @@ def onboarding_validate(
 
     if result.ready:
         console.print("\n[green]Ready to import.[/green] Run:")
-        console.print(f"  ai-os onboarding import {preset_id} {path} --yes")
+        console.print(f"  uv run ai-os onboarding import {preset_id} {path} --yes")
     elif result.duplicate_files == result.total_files and result.total_files > 0:
         console.print("\n[yellow]All files already imported — nothing new to add.[/yellow]")
     else:
@@ -457,10 +462,17 @@ def onboarding_import(
     def on_progress(msg: str) -> None:
         console.print(f"  {msg}")
 
-    console.print(f"[bold]Importing {result.new_files} file(s)...[/bold]")
+    console.print(f"\n[bold]Importing {result.new_files} file(s)...[/bold]")
     progress = importer.import_path(path, source_type=result.preset.source_type, tags=tags, on_progress=on_progress)
     summary = progress.report()
+
+    from ai_os.knowledge.maintenance import MaintenanceService
+
+    if MaintenanceService(get_settings()).ensure_search_indexes():
+        console.print("  [dim]Rebuilt search indexes[/dim]")
+
     console.print(f"\n[green]Done:[/green] {summary}")
+    console.print("[dim]Try: uv run ai-os search \"your topic\"[/dim]")
 
 
 @app.command("watch")
@@ -481,10 +493,25 @@ def watch(
 @app.command("backup")
 def backup(
     output: Path | None = typer.Option(None, "--output", "-o", help="Backup file path"),
+    verify: bool = typer.Option(False, "--verify", help="Verify latest or specified backup"),
 ) -> None:
-    """Create a compressed backup of knowledge directories."""
-    dest = MaintenanceService(get_settings()).backup(output)
+    """Create or verify a compressed backup of knowledge directories."""
+    service = MaintenanceService(get_settings())
+    if verify:
+        ok, msg = service.verify_backup(output)
+        if ok:
+            console.print(f"[green]{msg}[/green]")
+        else:
+            console.print(f"[red]{msg}[/red]")
+            raise typer.Exit(code=1)
+        return
+    dest = service.backup(output)
     console.print(f"[green]Backup created[/green] {dest}")
+    ok, msg = service.verify_backup(dest)
+    if ok:
+        console.print(f"[dim]{msg}[/dim]")
+    else:
+        console.print(f"[yellow]Warning:[/yellow] {msg}")
 
 
 @maintenance_app.command("ingest")

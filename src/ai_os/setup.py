@@ -120,29 +120,24 @@ def _check_ollama_models() -> SetupStep:
     )
 
 
-def _check_providers_plain() -> list[SetupStep]:
+def _check_providers_plain() -> SetupStep:
     discover_providers()
     health = health_check_all()
-    steps: list[SetupStep] = []
-    for h in health:
-        if h.provider_id in ("filesystem", "browser"):
-            continue
-        if h.status.value == "healthy":
-            steps.append(SetupStep(name=f"provider_{h.provider_id}", status="ok", message=f"{h.provider_id}: connected."))
-        elif h.status.value == "not_configured":
-            steps.append(SetupStep(
-                name=f"provider_{h.provider_id}",
-                status="warn",
-                message=f"{h.provider_id}: not configured (optional).",
-            ))
-        else:
-            steps.append(SetupStep(
-                name=f"provider_{h.provider_id}",
-                status="warn",
-                message=f"{h.provider_id}: {h.message}",
-                next_action=f"Check credentials for {h.provider_id} in .env",
-            ))
-    return steps
+    healthy = sum(1 for h in health if h.status.value == "healthy")
+    optional = sum(1 for h in health if h.status.value == "not_configured")
+    degraded = sum(1 for h in health if h.status.value not in ("healthy", "not_configured"))
+    if degraded:
+        return SetupStep(
+            name="providers",
+            status="warn",
+            message=f"Providers: {healthy} connected, {degraded} need attention, {optional} optional.",
+            next_action="Run: uv run ai-os provider health",
+        )
+    return SetupStep(
+        name="providers",
+        status="ok",
+        message=f"Providers: {healthy} connected, {optional} optional not configured.",
+    )
 
 
 def _map_system_check(result: CheckResult) -> SetupStep:
@@ -188,16 +183,14 @@ def run_setup() -> SetupReport:
     report.add(_check_writable_dirs())
     report.add(_check_env_file())
     report.add(_check_ollama_models())
-    for step in _check_providers_plain():
-        if step.status != "ok":
-            report.add(step)
+    report.add(_check_providers_plain())
 
     if not report.ready:
         failed = [s for s in report.steps if s.status == "fail"]
-        report.recommended_next = failed[0].next_action or "Run: ai-os doctor --full"
+        report.recommended_next = failed[0].next_action or "Run: uv run ai-os doctor --full"
     elif any(s.status == "warn" for s in report.steps):
-        report.recommended_next = "Run: ai-os onboarding  to import your knowledge."
+        report.recommended_next = "Run: uv run ai-os onboarding  to import your knowledge."
     else:
-        report.recommended_next = "Run: ai-os onboarding  then ai-os workflow run morning-briefing -f config/personal/workflows/morning-briefing.json"
+        report.recommended_next = "Run: uv run ai-os onboarding  then uv run ai-os workflow run morning-briefing -f config/personal/workflows/morning-briefing.json"
 
     return report

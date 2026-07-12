@@ -85,7 +85,10 @@ class MaintenanceService:
     def verify_backup(self, backup_path: Path | None = None) -> tuple[bool, str]:
         """Verify a backup archive is readable and contains expected structure."""
         if backup_path is None:
-            backups = sorted(self.settings.knowledge_backup_dir.glob("knowledge-backup-*.tar.gz"))
+            backup_dir = self.settings.knowledge_backup_dir
+            if not backup_dir.exists():
+                return False, "No backups found"
+            backups = sorted(backup_dir.glob("knowledge-backup-*.tar.gz"))
             if not backups:
                 return False, "No backups found"
             backup_path = backups[-1]
@@ -104,6 +107,16 @@ class MaintenanceService:
                 return True, f"Backup verified: {backup_path.name} ({len(names)} entries)"
         except tarfile.TarError as exc:
             return False, f"Invalid backup archive: {exc}"
+
+    def ensure_search_indexes(self) -> bool:
+        """Rebuild indexes when vector count does not match chunks (search would fail)."""
+        from ai_os.knowledge.health import HealthService
+
+        health = HealthService(self.settings).report(run_integrity=False)
+        if health.child_chunk_count > 0 and health.vector_index_count != health.child_chunk_count:
+            self.reindex()
+            return True
+        return False
 
     def run_all(self) -> dict[str, object]:
         """Run the full maintenance cycle: ingest, doctor, cleanup, reindex if needed."""

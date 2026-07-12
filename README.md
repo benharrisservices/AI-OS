@@ -123,7 +123,7 @@ uv run ai-os doctor --full
 ```bash
 uv run ai-os dashboard              # system overview
 uv run ai-os doctor --full          # validate entire installation
-uv run ai-os workflow run morning-briefing --input config/workflows/examples/morning-briefing.json
+uv run ai-os workflow run morning-briefing --input-file config/workflows/examples/morning-briefing.json
 uv run ai-os import ./docs --type folder --tag docs
 uv run ai-os provider health        # check provider adapters
 uv run ai-os update --check         # verify installation

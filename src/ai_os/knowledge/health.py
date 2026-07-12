@@ -92,7 +92,7 @@ class HealthService:
             warnings.append(
                 f"Vector index count ({vector_count}) differs from chunk count ({len(chunks)})"
             )
-            recommendations.append("Run: ai-os maintenance reindex")
+            recommendations.append("Run: ai-os maintenance reindex — search will not work until indexes match")
 
         if keyword_count != len(chunks):
             warnings.append(

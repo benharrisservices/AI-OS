@@ -22,6 +22,8 @@ Everything stays on your machine. Your secrets never go into the project folder.
 ### What you need
 
 - A Mac or Linux computer
+- **Python 3.12 or newer** (check with `python3 --version`)
+- **uv** package manager (install.sh installs it if missing)
 - Internet access (for setup and optional cloud features)
 - About 15 minutes for first setup
 
@@ -31,10 +33,24 @@ Open **Terminal** (Mac: search “Terminal” in Spotlight).
 
 ```bash
 cd /path/to/AI-OS
+chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
 This installs required software and creates folders automatically.
+
+**Important:** After installation, always run commands as:
+
+```bash
+uv run ai-os <command>
+```
+
+Or activate the virtual environment once per terminal session:
+
+```bash
+source .venv/bin/activate
+ai-os setup
+```
 
 ### Step 2: Install Ollama (your local AI engine)
 
@@ -320,7 +336,13 @@ uv run ai-os onboarding import business-projects ~/Projects --yes
 
 ### Restore
 
-Contact your technical support or see `docs/production-readiness.md` for restore procedures. Backups are standard `.tar.gz` archives of your knowledge folders.
+Verify your latest backup:
+
+```bash
+uv run ai-os backup --verify
+```
+
+Backups are `.tar.gz` archives in your `knowledge/backups/` folder containing `knowledge/raw`, `knowledge/processed`, and `knowledge/index`.
 
 ---
 
@@ -328,15 +350,17 @@ Contact your technical support or see `docs/production-readiness.md` for restore
 
 | I want to… | Command |
 |------------|---------|
-| First-time setup | `ai-os setup` |
-| See import plan | `ai-os onboarding` |
-| Validate import | `ai-os onboarding validate PRESET PATH` |
-| Import files | `ai-os onboarding import PRESET PATH --yes` |
-| Search knowledge | `ai-os search "query"` |
-| Morning briefing | `ai-os workflow run morning-briefing -f config/personal/workflows/morning-briefing.json` |
-| System overview | `ai-os dashboard` |
-| Full health check | `ai-os doctor --full` |
-| Backup | `ai-os backup` |
+| First-time setup | `uv run ai-os setup` |
+| See import plan | `uv run ai-os onboarding` |
+| Validate import | `uv run ai-os onboarding validate PRESET PATH` |
+| Import files | `uv run ai-os onboarding import PRESET PATH --yes` |
+| Search knowledge | `uv run ai-os search "query"` |
+| Morning briefing | `uv run ai-os workflow run morning-briefing -f config/personal/workflows/morning-briefing.json` |
+| System overview | `uv run ai-os dashboard` |
+| List decisions | `uv run ai-os decisions` |
+| Full health check | `uv run ai-os doctor --full` |
+| Backup | `uv run ai-os backup` |
+| Verify backup | `uv run ai-os backup --verify` |
 
 ---
 
