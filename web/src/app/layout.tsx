@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthGate } from "@/components/auth/auth-gate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sedr",
+  title: "sedr",
   description: "Personal Intelligence Platform",
 };
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     >
       <body className="min-h-full antialiased">
         <QueryProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <AuthGate>{children}</AuthGate>
+          </TooltipProvider>
         </QueryProvider>
       </body>
     </html>

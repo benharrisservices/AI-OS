@@ -11,13 +11,15 @@ import {
   GitBranch,
   Home,
   Layers,
+  LogOut,
   Plug,
   Scale,
   Settings,
-  Sparkles,
   Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SeedIcon } from "@/components/brand/seed-icon";
+import { logout } from "@/lib/auth";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -38,12 +40,12 @@ export function Sidebar() {
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-sidebar">
-      <div className="flex h-14 items-center gap-2 border-b border-border px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-          <Sparkles className="h-4 w-4 text-primary" aria-hidden />
+      <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/12">
+          <SeedIcon className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <p className="text-sm font-semibold tracking-tight">Sedr</p>
+          <p className="text-sm font-semibold tracking-tight lowercase">sedr</p>
           <p className="text-[10px] text-muted-foreground">Personal Intelligence Platform</p>
         </div>
       </div>
@@ -69,8 +71,16 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-border p-3">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="space-y-2 border-t border-border p-3">
+        <button
+          type="button"
+          onClick={logout}
+          className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4 shrink-0" aria-hidden />
+          Log out
+        </button>
+        <div className="flex items-center gap-2 px-2.5 text-xs text-muted-foreground">
           <GitBranch className="h-3 w-3" aria-hidden />
           <span>v1.2.0</span>
         </div>

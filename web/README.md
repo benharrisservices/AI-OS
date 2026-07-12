@@ -1,6 +1,6 @@
-# Sedr Web Dashboard
+# sedr Web Dashboard
 
-Thin Next.js client for the Sedr Personal Intelligence Platform. All business logic stays in the Python backend.
+Thin Next.js client for the sedr Personal Intelligence Platform. All business logic stays in the Python backend.
 
 ## Prerequisites
 
