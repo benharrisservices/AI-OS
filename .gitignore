@@ -38,6 +38,8 @@ downloads/
 eggs/
 .eggs/
 lib/
+!jbsh-me/src/lib/
+!jbsh-me/src/lib/**
 lib64/
 parts/
 sdist/
@@ -289,7 +291,6 @@ memory/**
 # Non-AI-OS projects (must not live inside this repository)
 # -----------------------------------------------------------------------------
 Tello/
-jbsh-me/
 
 # -----------------------------------------------------------------------------
 # Knowledge pipeline artifacts (large / generated)
