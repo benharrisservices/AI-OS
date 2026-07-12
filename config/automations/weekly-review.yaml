@@ -1,0 +1,16 @@
+automation_id: weekly-review
+name: Weekly Review
+description: Run weekly review every Sunday at 6pm UTC
+workflow_id: weekly-review
+input:
+  week_focus: "week in review"
+  output_path: "./memory/agent/weekly-review.txt"
+schedule:
+  schedule_type: cron
+  cron_expression: "0 18 * * 0"
+trigger:
+  trigger_type: schedule
+policy:
+  max_retries: 1
+  concurrency_limit: 1
+status: enabled

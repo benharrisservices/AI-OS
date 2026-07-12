@@ -1,0 +1,25 @@
+workflow_id: project-review
+name: Project Review
+description: Review project status and next steps.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: research
+    name: Project context
+    tool_name: skill_company_research
+    input:
+      query: "{{input.project_name}} status and progress"
+
+  - step_id: decide
+    name: Review decisions
+    tool_name: decision_make
+    input:
+      question: "Review project {{input.project_name}} and recommend next steps"
+      strategy: strategic
+
+  - step_id: record
+    name: Save review
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.decide.summary}}"

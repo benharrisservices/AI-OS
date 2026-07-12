@@ -1,0 +1,24 @@
+workflow_id: weekly-review
+name: Weekly Review
+description: End-of-week review and planning.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: research
+    name: Review the week
+    tool_name: skill_deep_research
+    input:
+      query: "weekly review {{input.week_focus}}"
+
+  - step_id: plan
+    name: Plan next week
+    tool_name: skill_task_planning
+    input:
+      goal: "Plan next week based on: {{input.week_focus}}"
+
+  - step_id: record
+    name: Save review
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.plan.summary}}"

@@ -1,0 +1,25 @@
+workflow_id: inbox-processing
+name: Inbox Processing
+description: Process and triage inbox items.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: summarise
+    name: Summarise inbox
+    tool_name: skill_document_summarisation
+    input:
+      query: "{{input.inbox_query}}"
+
+  - step_id: decide
+    name: Triage decisions
+    tool_name: decision_make
+    input:
+      question: "How should I triage these inbox items?"
+      strategy: operational
+
+  - step_id: record
+    name: Save triage
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.decide.summary}}"

@@ -1,0 +1,18 @@
+workflow_id: repo-health
+name: Repository Health Check
+description: Analyse repository health and code quality.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: analyse
+    name: Repository analysis
+    tool_name: skill_github_repository_analysis
+    input:
+      repo: "{{input.repo}}"
+
+  - step_id: record
+    name: Save report
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.analyse.summary}}"

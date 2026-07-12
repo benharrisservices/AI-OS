@@ -1,0 +1,19 @@
+workflow_id: meeting-preparation
+name: Meeting Preparation
+description: Prepare for an upcoming meeting.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: prep
+    name: Meeting prep
+    tool_name: skill_meeting_preparation
+    input:
+      meeting_topic: "{{input.meeting_topic}}"
+      attendees: "{{input.attendees}}"
+
+  - step_id: record
+    name: Save brief
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.prep.summary}}"

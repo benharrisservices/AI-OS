@@ -1,0 +1,24 @@
+workflow_id: knowledge-digest
+name: Personal Knowledge Digest
+description: Digest recent knowledge and memories.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: research
+    name: Knowledge sweep
+    tool_name: skill_deep_research
+    input:
+      query: "{{input.topic}}"
+
+  - step_id: summarise
+    name: Summarise findings
+    tool_name: skill_document_summarisation
+    input:
+      query: "{{input.topic}}"
+
+  - step_id: record
+    name: Save digest
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.summarise.summary}}"

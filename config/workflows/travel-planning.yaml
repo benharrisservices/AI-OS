@@ -1,0 +1,30 @@
+workflow_id: travel-planning
+name: Travel Planning
+description: Plan travel with research and comparison.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: travel
+    name: Travel research
+    tool_name: skill_travel_planning
+    input:
+      query: "{{input.destination}}"
+
+  - step_id: flights
+    name: Flight options
+    tool_name: skill_flight_research
+    input:
+      query: "flights to {{input.destination}}"
+
+  - step_id: hotels
+    name: Hotel options
+    tool_name: skill_hotel_research
+    input:
+      query: "hotels in {{input.destination}}"
+
+  - step_id: record
+    name: Save plan
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "Travel plan for {{input.destination}}"

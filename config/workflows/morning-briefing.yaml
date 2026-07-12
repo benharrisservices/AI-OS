@@ -1,0 +1,31 @@
+workflow_id: morning-briefing
+name: Morning Briefing
+description: Daily morning briefing with knowledge digest and priorities.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: research
+    name: Gather overnight context
+    tool_name: skill_deep_research
+    input:
+      query: "{{input.focus}}"
+      top_k: 10
+
+  - step_id: decide
+    name: Prioritise the day
+    tool_name: decision_make
+    input:
+      question: "What are today's top priorities given: {{input.focus}}"
+      strategy: operational
+
+  - step_id: timestamp
+    name: Timestamp
+    tool_name: datetime_now
+    input: {}
+
+  - step_id: record
+    name: Write briefing
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.decide.summary}}"

@@ -1,0 +1,25 @@
+workflow_id: research-pipeline
+name: Research Pipeline
+description: Structured research with decision brief.
+version: "1.0.0"
+agent_id: agt_reviewer
+steps:
+  - step_id: research
+    name: Deep research
+    tool_name: skill_deep_research
+    input:
+      query: "{{input.topic}}"
+
+  - step_id: brief
+    name: Decision brief
+    tool_name: skill_decision_brief_generation
+    input:
+      question: "{{input.topic}}"
+      strategy: analytical
+
+  - step_id: record
+    name: Save research
+    tool_name: filesystem_write
+    input:
+      path: "{{input.output_path}}"
+      content: "{{steps.brief.summary}}"
