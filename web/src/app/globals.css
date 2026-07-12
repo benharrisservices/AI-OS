@@ -123,30 +123,96 @@
   --color-brand: oklch(0.68 0.14 162);
 }
 
+/* Deep forest → emerald → soft mint */
+:root {
+  --brand-gradient: linear-gradient(
+    135deg,
+    oklch(0.42 0.1 165) 0%,
+    oklch(0.58 0.13 162) 55%,
+    oklch(0.82 0.08 165) 100%
+  );
+  --brand-gradient-soft: linear-gradient(
+    135deg,
+    color-mix(in oklch, oklch(0.5 0.12 163) 16%, transparent),
+    color-mix(in oklch, oklch(0.72 0.1 165) 8%, transparent)
+  );
+  --shadow-soft: 0 1px 2px oklch(0.2 0.02 165 / 0.04), 0 4px 16px oklch(0.2 0.02 165 / 0.04);
+}
+.dark {
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.2), 0 8px 24px oklch(0 0 0 / 0.18);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-size: 0.9688rem; /* ~15.5px body */
+    font-weight: 460;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
     font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
   }
 }
 
 @layer utilities {
   .page-title {
-    @apply text-[1.75rem] font-semibold tracking-[-0.025em] text-foreground;
+    @apply text-[2rem] leading-[1.15] tracking-[-0.03em] text-foreground;
+    font-weight: 780;
   }
   .page-subtitle {
-    @apply text-[0.9375rem] leading-relaxed text-muted-foreground;
+    @apply text-[0.9688rem] leading-relaxed text-muted-foreground;
+    font-weight: 460;
+  }
+  .section-heading {
+    @apply text-[1.0625rem] tracking-[-0.02em] text-foreground;
+    font-weight: 700;
   }
   .metric-value {
-    @apply text-3xl font-semibold tracking-[-0.03em] tabular-nums text-foreground;
+    @apply text-[2.125rem] leading-[1.1] tracking-[-0.035em] tabular-nums text-foreground;
+    font-weight: 720;
   }
   .metric-label {
-    @apply text-[0.8125rem] font-medium tracking-wide text-muted-foreground uppercase;
+    @apply text-[0.75rem] tracking-[0.04em] text-muted-foreground uppercase;
+    font-weight: 560;
+  }
+  .brand-gradient-fill {
+    background-image: var(--brand-gradient);
+  }
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  /* Selected nav: soft emerald fill + subtle gradient border, no glow */
+  .nav-selected {
+    position: relative;
+    background: var(--brand-gradient-soft);
+  }
+  .nav-selected::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--primary) 45%, transparent),
+      color-mix(in oklch, var(--primary) 10%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }
