@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from ai_os.api.auth import require_api_key
 from ai_os.api.serialize import to_json
 from ai_os.memory.intelligence import MemoryIntelligence
 from ai_os.memory.manager import MemoryManager
@@ -68,7 +69,7 @@ def get_memory(memory_id: str) -> dict:
     return to_json(record)
 
 
-@router.post("/{memory_id}/promote")
+@router.post("/{memory_id}/promote", dependencies=[Depends(require_api_key)])
 def promote_memory(memory_id: str) -> dict:
     from ai_os.memory.models import PromotionRequest
 
@@ -76,7 +77,7 @@ def promote_memory(memory_id: str) -> dict:
     return to_json(result)
 
 
-@router.post("/{memory_id}/archive")
+@router.post("/{memory_id}/archive", dependencies=[Depends(require_api_key)])
 def archive_memory(memory_id: str) -> dict:
     record = MemoryManager().archive(memory_id)
     if not record:

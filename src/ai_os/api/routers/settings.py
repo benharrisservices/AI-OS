@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from ai_os.api.auth import require_api_key
 from ai_os.api.serialize import to_json
 from ai_os.agent.config import AgentSettings
 from ai_os.automation.config import AutomationSettings
@@ -79,6 +80,6 @@ def setup_report() -> dict:
     return to_json(run_setup())
 
 
-@router.post("/doctor")
+@router.post("/doctor", dependencies=[Depends(require_api_key)])
 def system_doctor() -> dict:
     return to_json(run_full_check(include_benchmarks=False))

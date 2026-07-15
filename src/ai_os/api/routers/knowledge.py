@@ -5,9 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from ai_os.api.auth import require_api_key
 from ai_os.api.serialize import to_json
 from ai_os.knowledge.config import get_settings
 from ai_os.knowledge.health import HealthService
@@ -111,7 +112,7 @@ def retrieve_knowledge(body: RetrieveBody) -> dict:
     return to_json(bundle)
 
 
-@router.post("/reindex")
+@router.post("/reindex", dependencies=[Depends(require_api_key)])
 def reindex_knowledge() -> dict:
     MaintenanceService(get_settings()).ensure_search_indexes()
     return {"status": "ok", "message": "Reindex complete"}

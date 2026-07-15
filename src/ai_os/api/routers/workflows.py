@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from ai_os.api.auth import require_api_key
 from ai_os.api.serialize import to_json
 from ai_os.agent.config import get_agent_settings
 from ai_os.agent.engine import ExecutionEngine
@@ -34,7 +35,7 @@ def get_workflow(workflow_id: str) -> dict:
     return to_json(workflow)
 
 
-@router.post("/workflows/{workflow_id}/run")
+@router.post("/workflows/{workflow_id}/run", dependencies=[Depends(require_api_key)])
 def run_workflow(workflow_id: str, body: RunWorkflowBody) -> dict:
     inputs = dict(body.inputs)
     if body.input_file:

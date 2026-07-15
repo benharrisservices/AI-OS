@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from ai_os.api.auth import require_api_key
 from ai_os.api.serialize import to_json
 from ai_os.decision.config import get_decision_settings
 from ai_os.decision.models import DecisionRequest
@@ -32,7 +33,7 @@ def get_decision(decision_id: str) -> dict:
     return to_json(result)
 
 
-@router.post("")
+@router.post("", dependencies=[Depends(require_api_key)])
 def create_decision(request: DecisionRequest) -> dict:
     result = DecisionPipeline().decide(request)
     return to_json(result)
