@@ -46,6 +46,9 @@ def apply_data_dir_defaults() -> None:
         "MEMORY_EPISODIC_DIR": f"{root}/memory/episodic",
         "MEMORY_SEMANTIC_DIR": f"{root}/memory/semantic",
         "MEMORY_PROCEDURAL_DIR": f"{root}/memory/procedural",
+        # Workflow / agent runtime outputs (tasks + logs) under the volume.
+        "AGENT_TASKS_DIR": f"{root}/memory/agent/tasks",
+        "AGENT_LOGS_DIR": f"{root}/memory/agent/logs",
     }
     for key, value in defaults.items():
         if not os.environ.get(key, "").strip():

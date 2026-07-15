@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml README.md ai_os_bootstrap.pth ./
 COPY src ./src
+COPY config ./config
 
 RUN uv sync --extra api --no-dev
 

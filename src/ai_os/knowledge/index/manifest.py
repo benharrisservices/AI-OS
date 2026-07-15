@@ -37,9 +37,19 @@ class ManifestService:
         last_reindex_at=None,
     ) -> IndexManifest:
         manifest = self.load()
-        manifest.embedding_provider = self.settings.embedding_provider
-        manifest.embedding_model = self.settings.embedding_model
-        manifest.embedding_dimensions = self.settings.embedding_dimensions
+        # Prefer OpenAI dimensions when that provider is active for this process.
+        from ai_os.knowledge.embedding import EmbeddingService
+
+        try:
+            emb = EmbeddingService(self.settings)
+            emb._ensure_provider()
+            manifest.embedding_provider = emb.active_provider
+            manifest.embedding_model = emb.active_model
+            manifest.embedding_dimensions = emb.expected_dimensions
+        except Exception:
+            manifest.embedding_provider = self.settings.embedding_provider
+            manifest.embedding_model = self.settings.embedding_model
+            manifest.embedding_dimensions = self.settings.embedding_dimensions
         manifest.vector_store = self.settings.vector_store
         manifest.vector_store_path = str(self.settings.vector_store_path)
         manifest.keyword_index_path = str(self.settings.knowledge_index_dir / "keyword")

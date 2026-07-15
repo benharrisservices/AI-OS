@@ -14,9 +14,32 @@ from ai_os.knowledge.models import SourceStatus
 from ai_os.knowledge.pipeline import KnowledgePipeline
 from ai_os.knowledge.registry import SourceRegistry
 
-PRESETS_PATH = Path(__file__).resolve().parents[3] / "config" / "onboarding" / "presets.yaml"
 SUPPORTED_SUFFIXES = {".md", ".markdown", ".txt", ".pdf", ".docx", ".html", ".htm"}
 SECONDS_PER_FILE = 3.0  # rough estimate including embedding
+
+
+def _presets_path() -> Path:
+    """Locate onboarding presets in repo, Docker image, or AI_OS_CONFIG_PATH."""
+    import os
+
+    candidates: list[Path] = []
+    env_root = os.environ.get("AI_OS_CONFIG_PATH", "").strip()
+    if env_root:
+        candidates.append(Path(env_root) / "onboarding" / "presets.yaml")
+    candidates.append(Path("/app/config/onboarding/presets.yaml"))
+    candidates.append(Path.cwd() / "config" / "onboarding" / "presets.yaml")
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "config" / "onboarding" / "presets.yaml"
+        candidates.append(candidate)
+        if candidate.exists():
+            break
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[0]
+
+
+PRESETS_PATH = _presets_path()
 
 
 @dataclass

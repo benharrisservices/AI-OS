@@ -174,6 +174,34 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ preset_id: presetId, source_path: sourcePath }),
       }),
+    /** Upload via same-origin Next.js proxy (server holds AI_OS_API_KEY). */
+    upload: async (
+      files: File[],
+      presetId: string,
+      tags = "",
+    ): Promise<UploadProgress> => {
+      const form = new FormData();
+      form.append("preset_id", presetId);
+      if (tags) form.append("tags", tags);
+      for (const file of files) {
+        form.append("files", file);
+      }
+      const res = await fetch("/api/imports/upload", {
+        method: "POST",
+        body: form,
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        let body: unknown;
+        try {
+          body = await res.json();
+        } catch {
+          body = await res.text();
+        }
+        throw new ApiError(`API ${res.status}: /api/imports/upload`, res.status, body);
+      }
+      return res.json() as Promise<UploadProgress>;
+    },
   },
 };
 
@@ -390,4 +418,12 @@ export interface ImportProgress {
   skipped: number;
   failed: number;
   errors: string[];
+}
+
+export interface UploadProgress extends ImportProgress {
+  saved_files: number;
+  rejected?: string[];
+  document_count?: number;
+  chunk_count?: number;
+  duplicate_files?: number;
 }
