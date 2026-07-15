@@ -43,7 +43,12 @@ def get_dashboard() -> dict:
     tasks = TaskStore(get_agent_settings()).list_tasks()[:10]
     activity = AutomationService(get_automation_settings()).history(limit=10)
     route = ModelRouter().route(ModelRequest(task="daily briefing"))
-    recent_knowledge = HybridSearch(settings).search(SearchQuery(query="architecture", top_k=5))
+    try:
+        recent_knowledge = HybridSearch(settings).search(SearchQuery(query="architecture", top_k=5))
+    except Exception:
+        # Knowledge search needs the embedder (Ollama); if it is unavailable in
+        # production, degrade gracefully rather than failing the whole dashboard.
+        recent_knowledge = []
 
     return {
         "status": "healthy" if health.healthy else "needs_attention",
